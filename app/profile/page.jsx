@@ -120,6 +120,10 @@ export default function ProfilePage() {
 
   return (
     <main className="min-h-screen pb-24 app-theme-bg font-sans relative overflow-hidden flex flex-col items-center">
+      {/* Decorative Blur Orbs */}
+      <div className="absolute top-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full bg-white/3 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-white/3 blur-[120px] pointer-events-none" />
+
       <div className="max-w-md w-full px-6 pt-6 flex flex-col gap-6 relative z-10">
         {/* Header Bar */}
         <div className="flex items-center justify-between w-full">
@@ -206,7 +210,7 @@ export default function ProfilePage() {
           {/* Edit Profile Button */}
           <button
             onClick={() => router.push("/profile/edit")}
-            className="mt-4.5 mb-2 w-full py-3.5 app-theme-card hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl text-xs font-bold text-[var(--text-color)] shadow-md active:scale-95 transition-all cursor-pointer"
+            className="mt-4.5 mb-2 w-full py-3.5 app-theme-card hover:bg-black/10 dark:hover:bg-white/10 hover:shadow-[0_0_15px_rgba(255,255,255,0.06)] rounded-2xl text-xs font-bold text-[var(--text-color)] shadow-md active:scale-95 transition-all cursor-pointer"
           >
             Edit Profile
           </button>
@@ -220,7 +224,7 @@ export default function ProfilePage() {
               onClick={() => setActiveTab(tab)}
               className={`flex-1 py-3 text-xs font-bold rounded-xl transition-all duration-300 ease-in-out cursor-pointer active:scale-95 capitalize ${
                 activeTab === tab
-                  ? "bg-[var(--text-color)] text-[var(--bg-color)] shadow-lg"
+                  ? "bg-[var(--text-color)] text-[var(--bg-color)] shadow-[0_0_15px_rgba(255,255,255,0.12)]"
                   : "text-[var(--text-color)]/55 hover:text-[var(--text-color)] hover:bg-black/5 dark:hover:bg-white/5"
               }`}
             >
@@ -245,7 +249,7 @@ export default function ProfilePage() {
                 {feeds.map((feed) => (
                   <div
                     key={feed.id}
-                    className="w-full p-4.5 rounded-3xl app-theme-card relative overflow-hidden flex flex-col gap-3 shadow-xl"
+                    className="w-full p-4.5 rounded-3xl app-theme-card relative overflow-hidden flex flex-col gap-3 shadow-xl hover:scale-[1.01] hover:shadow-[0_0_20px_rgba(255,255,255,0.08)] transition-all duration-300"
                   >
                     {/* Header */}
                     <div className="flex justify-between items-start w-full">
@@ -294,7 +298,7 @@ export default function ProfilePage() {
                 {challenges.map((challenge) => (
                   <div
                     key={challenge.id}
-                    className="w-full p-4.5 rounded-3xl app-theme-card relative overflow-hidden flex flex-col gap-3 shadow-xl"
+                    className="w-full p-4.5 rounded-3xl app-theme-card relative overflow-hidden flex flex-col gap-3 shadow-xl hover:scale-[1.01] hover:shadow-[0_0_20px_rgba(255,255,255,0.08)] transition-all duration-300"
                   >
                     <div className="flex justify-between items-start w-full">
                       <h4 className="text-xs font-bold app-theme-text tracking-tight leading-tight">
@@ -340,7 +344,7 @@ export default function ProfilePage() {
                 {badges.map((badge) => (
                   <div
                     key={badge.id}
-                    className="app-theme-card rounded-3xl p-4.5 flex flex-col items-center text-center justify-between min-h-[140px] shadow-xl hover:scale-[1.02] transition-transform"
+                    className="app-theme-card rounded-3xl p-4.5 flex flex-col items-center text-center justify-between min-h-[140px] shadow-xl hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(255,255,255,0.08)] transition-all duration-300"
                   >
                     <div
                       className="w-12 h-12 rounded-2xl bg-black/10 dark:bg-white/10 flex items-center justify-center border border-black/5 dark:border-white/10 shadow-lg"

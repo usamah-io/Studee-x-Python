@@ -2,16 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Bell, Moon, Globe, LogOut, Database, Settings } from "lucide-react";
+import { ChevronLeft, Bell, Globe, LogOut, Database, Settings } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "../../../lib/ThemeContext";
 import { motion, AnimatePresence } from "framer-motion";
 import "../../../lib/i18n";
 
 export default function SettingsPage() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const { isDarkMode, toggleTheme } = useTheme();
   
   // Toggles
   const [notificationsPaused, setNotificationsPaused] = useState(false);
@@ -56,13 +54,13 @@ export default function SettingsPage() {
         <div className="flex items-center justify-between w-full">
           <button
             onClick={() => router.push("/profile")}
-            className="w-10 h-10 bg-white/10 hover:bg-white/20 border border-white/15 rounded-xl flex items-center justify-center text-white transition-all cursor-pointer shadow-md active:scale-95"
+            className="w-10 h-10 bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 border border-black/5 dark:border-white/15 rounded-xl flex items-center justify-center text-slate-800 dark:text-white transition-all cursor-pointer shadow-md active:scale-95"
             aria-label="Back"
           >
-            <ChevronLeft className="w-5 h-5 text-white/90" />
+            <ChevronLeft className="w-5 h-5 text-slate-800 dark:text-white/90" />
           </button>
           
-          <span className="text-sm font-bold tracking-wider text-white/90">{t("settings.title")}</span>
+          <span className="text-sm font-bold tracking-wider text-slate-900 dark:text-white/90">{t("settings.title")}</span>
           
           <div className="w-10" /> {/* Spacer */}
         </div>
@@ -73,12 +71,12 @@ export default function SettingsPage() {
           {/* Pause Notifications Toggle */}
           <div className="w-full flex items-center justify-between p-4 rounded-2xl app-theme-card shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-300">
+              <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-650 dark:text-purple-300">
                 <Bell className="w-4.5 h-4.5" />
               </div>
               <div className="flex flex-col">
-                <span className="text-xs font-semibold text-white">{t("settings.pauseNotifications")}</span>
-                <span className="text-[9px] text-white/40 mt-0.5">
+                <span className="text-xs font-semibold text-slate-900 dark:text-white">{t("settings.pauseNotifications")}</span>
+                <span className="text-[9px] text-slate-500 dark:text-white/40 mt-0.5">
                   {i18n.language === "en" ? "Temporarily halt push updates" : "Hentikan sementara pemberitahuan"}
                 </span>
               </div>
@@ -87,8 +85,8 @@ export default function SettingsPage() {
             {/* Toggle Switch */}
             <button 
               onClick={() => setNotificationsPaused(!notificationsPaused)}
-              className={`w-10 h-6 rounded-full p-0.5 transition-all duration-300 ${
-                notificationsPaused ? "bg-purple-500" : "bg-white/10"
+              className={`w-10 h-6 rounded-full p-0.5 transition-all duration-300 cursor-pointer ${
+                notificationsPaused ? "bg-purple-500" : "bg-black/10 dark:bg-white/10"
               }`}
             >
               <div className={`w-5 h-5 rounded-full bg-white shadow-md transition-all duration-300 ${
@@ -97,49 +95,22 @@ export default function SettingsPage() {
             </button>
           </div>
 
-          {/* Dark Mode Toggle */}
-          <div className="w-full flex items-center justify-between p-4 rounded-2xl app-theme-card shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-300">
-                <Moon className="w-4.5 h-4.5" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xs font-semibold text-white">{t("settings.darkMode")}</span>
-                <span className="text-[9px] text-white/40 mt-0.5">
-                  {i18n.language === "en" ? "Use black color themes" : "Gunakan tampilan gelap"}
-                </span>
-              </div>
-            </div>
-            
-            {/* Toggle Switch */}
-            <button 
-              onClick={toggleTheme}
-              className={`w-10 h-6 rounded-full p-0.5 transition-all duration-300 ${
-                isDarkMode ? "bg-purple-500" : "bg-white/10"
-              }`}
-            >
-              <div className={`w-5 h-5 rounded-full bg-white shadow-md transition-all duration-300 ${
-                isDarkMode ? "translate-x-4" : "translate-x-0"
-              }`} />
-            </button>
-          </div>
-
           {/* Language Selection */}
           <div 
             onClick={() => setIsLanguageModalOpen(true)}
-            className="w-full flex items-center justify-between p-4 rounded-2xl app-theme-card hover:bg-white/5 transition-all cursor-pointer shadow-sm"
+            className="w-full flex items-center justify-between p-4 rounded-2xl app-theme-card hover:bg-black/5 dark:hover:bg-white/5 transition-all cursor-pointer shadow-sm"
           >
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-300">
+              <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-650 dark:text-purple-300">
                 <Globe className="w-4.5 h-4.5" />
               </div>
               <div className="flex flex-col">
-                <span className="text-xs font-semibold text-white">{t("settings.language")}</span>
-                <span className="text-[9px] text-white/40 mt-0.5">{getLanguageLabel()}</span>
+                <span className="text-xs font-semibold text-slate-900 dark:text-white">{t("settings.language")}</span>
+                <span className="text-[9px] text-slate-500 dark:text-white/40 mt-0.5">{getLanguageLabel()}</span>
               </div>
             </div>
             
-            <span className="text-[10px] text-purple-300 font-bold">{i18n.language === "en" ? "Change" : "Ubah"}</span>
+            <span className="text-[10px] text-purple-600 dark:text-purple-300 font-bold">{i18n.language === "en" ? "Change" : "Ubah"}</span>
           </div>
 
 
@@ -147,11 +118,11 @@ export default function SettingsPage() {
           {/* Log Out Button */}
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-between p-4 rounded-2xl bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 ease-in-out cursor-pointer shadow-sm mt-4 text-red-200"
+            className="w-full flex items-center justify-between p-4 rounded-2xl bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 ease-in-out cursor-pointer shadow-sm mt-4 text-red-600 dark:text-red-200"
           >
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-red-500/20 flex items-center justify-center">
-                <LogOut className="w-4.5 h-4.5 text-red-400" />
+                <LogOut className="w-4.5 h-4.5 text-red-650 dark:text-red-400" />
               </div>
               <span className="text-xs font-bold">{t("settings.logOut")}</span>
             </div>
@@ -168,19 +139,19 @@ export default function SettingsPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center px-6"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center px-6"
           >
-            <div className="max-w-xs w-full bg-slate-900 border border-white/10 rounded-3xl p-6 flex flex-col gap-4 shadow-2xl relative overflow-hidden">
+            <div className="max-w-xs w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl p-6 flex flex-col gap-4 shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-500 opacity-5 blur-2xl pointer-events-none" />
               
-              <div className="flex justify-between items-center w-full pb-2 border-b border-white/5">
+              <div className="flex justify-between items-center w-full pb-2 border-b border-slate-100 dark:border-white/5">
                 <div className="flex flex-col">
-                  <h3 className="text-xs font-bold text-white uppercase tracking-wider">{t("settings.languageModalTitle")}</h3>
-                  <span className="text-[9px] text-white/40 font-semibold mt-0.5">{t("settings.languageModalDesc")}</span>
+                  <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">{t("settings.languageModalTitle")}</h3>
+                  <span className="text-[9px] text-slate-500 dark:text-white/40 font-semibold mt-0.5">{t("settings.languageModalDesc")}</span>
                 </div>
                 <button 
                   onClick={() => setIsLanguageModalOpen(false)}
-                  className="text-white/40 hover:text-white/70 transition-colors p-1"
+                  className="text-slate-450 hover:text-slate-700 dark:text-white/40 dark:hover:text-white/70 transition-colors p-1 cursor-pointer"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -197,10 +168,10 @@ export default function SettingsPage() {
                     localStorage.setItem("studee_language", "id");
                     setIsLanguageModalOpen(false);
                   }}
-                  className={`w-full p-3.5 rounded-xl border text-xs font-bold transition-all text-left flex justify-between items-center ${
+                  className={`w-full p-3.5 rounded-xl border text-xs font-bold transition-all text-left flex justify-between items-center cursor-pointer ${
                     i18n.language === "id"
-                      ? "bg-purple-600/10 border-purple-500/30 text-purple-200"
-                      : "bg-white/5 border-white/5 text-white/60 hover:bg-white/8 hover:text-white"
+                      ? "bg-purple-50 dark:bg-purple-600/10 border-purple-200 dark:border-purple-500/30 text-purple-700 dark:text-purple-200"
+                      : "bg-slate-50 dark:bg-white/5 border-slate-100 dark:border-white/5 text-slate-700 dark:text-white/60 hover:bg-slate-100 dark:hover:bg-white/8 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
                   <span>Bahasa Indonesia</span>
@@ -214,10 +185,10 @@ export default function SettingsPage() {
                     localStorage.setItem("studee_language", "en");
                     setIsLanguageModalOpen(false);
                   }}
-                  className={`w-full p-3.5 rounded-xl border text-xs font-bold transition-all text-left flex justify-between items-center ${
+                  className={`w-full p-3.5 rounded-xl border text-xs font-bold transition-all text-left flex justify-between items-center cursor-pointer ${
                     i18n.language === "en"
-                      ? "bg-purple-600/10 border-purple-500/30 text-purple-200"
-                      : "bg-white/5 border-white/5 text-white/60 hover:bg-white/8 hover:text-white"
+                      ? "bg-purple-50 dark:bg-purple-600/10 border-purple-200 dark:border-purple-500/30 text-purple-700 dark:text-purple-200"
+                      : "bg-slate-50 dark:bg-white/5 border-slate-100 dark:border-white/5 text-slate-700 dark:text-white/60 hover:bg-slate-100 dark:hover:bg-white/8 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
                   <span>English (US)</span>

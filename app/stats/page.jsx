@@ -166,6 +166,10 @@ export default function StatsPage() {
 
   return (
     <main className="min-h-screen pb-24 app-theme-bg font-sans relative overflow-hidden flex flex-col items-center">
+      {/* Decorative Blur Orbs */}
+      <div className="absolute top-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full bg-white/3 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-white/3 blur-[120px] pointer-events-none" />
+
       <div className="max-w-md w-full px-6 pt-6 flex flex-col gap-6 relative z-10">
         
         {/* Header Bar */}
@@ -189,7 +193,7 @@ export default function StatsPage() {
         {/* Stats Summary (Row) */}
         <div className="grid grid-cols-2 gap-4 w-full">
           {/* Card 1: Total Belajar */}
-          <div className="app-theme-card rounded-3xl p-5 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[110px] hover:scale-[1.01] transition-all">
+          <div className="app-theme-card rounded-3xl p-5 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[110px] hover:scale-[1.01] hover:shadow-[0_0_20px_rgba(255,255,255,0.08)] transition-all">
             <div className="flex justify-between items-start w-full">
               <span className="text-[10px] app-theme-text-muted font-bold uppercase tracking-wider">Total Belajar</span>
               <Flame className={`w-4 h-4 ${
@@ -205,7 +209,7 @@ export default function StatsPage() {
           </div>
           
           {/* Card 2: Rata-rata Harian */}
-          <div className="app-theme-card rounded-3xl p-5 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[110px] hover:scale-[1.01] transition-all">
+          <div className="app-theme-card rounded-3xl p-5 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[110px] hover:scale-[1.01] hover:shadow-[0_0_20px_rgba(255,255,255,0.08)] transition-all">
             <div className="flex justify-between items-start w-full">
               <span className="text-[10px] app-theme-text-muted font-bold uppercase tracking-wider">Rata-rata Harian</span>
               <div className="relative w-5 h-5 flex items-center justify-center bg-black/5 dark:bg-white/5 rounded-full border border-[var(--border-color)] flex-shrink-0">
@@ -231,7 +235,7 @@ export default function StatsPage() {
             {courseData.map((subj) => (
               <ProtectedCourse key={subj.id} subjectId={subj.id}>
                 <div 
-                  className="app-theme-card rounded-3xl p-5 flex flex-col justify-between aspect-square hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 shadow-xl cursor-pointer"
+                  className="app-theme-card rounded-3xl p-5 flex flex-col justify-between aspect-square hover:scale-[1.02] active:scale-[0.99] hover:shadow-[0_0_20px_rgba(255,255,255,0.08)] transition-all duration-300 shadow-xl cursor-pointer"
                 >
                   {/* Top: Icon */}
                   <div className="w-10 h-10 rounded-xl bg-black/10 dark:bg-white/10 flex items-center justify-center border border-black/5 dark:border-white/10 flex-shrink-0">

@@ -49,6 +49,10 @@ export default function LibraryPage() {
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className="min-h-screen pb-32 app-theme-bg font-sans relative overflow-hidden"
     >
+      {/* Decorative Blur Orbs */}
+      <div className="absolute top-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full bg-white/3 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-white/3 blur-[120px] pointer-events-none" />
+
       <div className="max-w-md mx-auto px-6 pt-12 md:pt-16 flex flex-col gap-6 relative z-10">
         {/* Header Navigation */}
         <div className="flex items-center justify-between w-full">
@@ -84,7 +88,7 @@ export default function LibraryPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.25 }}
-                  className="app-theme-card rounded-3xl p-5 flex flex-col justify-between aspect-square hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 shadow-xl cursor-pointer group relative overflow-hidden"
+                  className="app-theme-card rounded-3xl p-5 flex flex-col justify-between aspect-square hover:scale-[1.02] active:scale-[0.99] hover:shadow-[0_0_20px_rgba(255,255,255,0.08)] transition-all duration-300 shadow-xl cursor-pointer group relative overflow-hidden"
                 >
                   {/* Top: Icon */}
                   <div className="w-9 h-9 rounded-xl bg-black/10 dark:bg-white/10 border border-black/5 dark:border-white/10 flex items-center justify-center flex-shrink-0">

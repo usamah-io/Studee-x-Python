@@ -92,7 +92,13 @@ export default function Navbar() {
     return null;
   }
 
-  if (pathname === "/" || pathname === "/onboarding" || pathname === "/login" || pathname.startsWith("/admin")) {
+  if (
+    pathname === "/" ||
+    pathname === "/onboarding" ||
+    pathname === "/login" ||
+    pathname.startsWith("/admin") ||
+    /^\/lesson\/[^/]+\/[^/]+$/.test(pathname)
+  ) {
     return null;
   }
 

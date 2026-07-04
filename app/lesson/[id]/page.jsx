@@ -123,18 +123,20 @@ export default function LessonPage() {
           if (subjects && !subjects.error) {
             const found = subjects.find((s) => String(s.id) === String(id));
             if (found) {
+              const hasSyllabus = found.syllabus && found.syllabus.length > 0;
+              const finalSyllabus = hasSyllabus ? found.syllabus : [
+                { title: "Pengenalan Materi", duration: "15 Menit" }
+              ];
               setLesson({
                 id: found.id,
                 name: found.title,
                 level: found.level || "Beginner",
                 description: found.description,
-                lessonsCount: found.syllabus ? found.syllabus.length : 12,
+                lessonsCount: finalSyllabus.length,
                 quizzesCount: found.quizzesCount || 6,
                 hoursCount: found.hoursCount || 8,
                 iconType: found.id,
-                syllabus: found.syllabus || [
-                  { title: "Pengenalan Materi", duration: "10 Menit" }
-                ],
+                syllabus: finalSyllabus,
                 videoUrl: found.videoUrl || ""
               });
             }

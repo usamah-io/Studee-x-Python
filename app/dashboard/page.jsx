@@ -11,6 +11,8 @@ import {
   Flame,
   Sparkles,
   ChevronRight,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useStreak } from "../../lib/StreakContext";
 import { useCourseData } from "../../lib/CourseDataContext";
@@ -44,7 +46,7 @@ function AnimatedNumber({ value, duration = 1200 }) {
 
 
 export default function Home() {
-  const { isDarkMode } = useTheme();
+  const { isDarkMode, toggleTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [activeTab, setActiveTab] = useState("home");
@@ -260,12 +262,12 @@ export default function Home() {
     return (
       <div className="app-theme-card rounded-3xl p-6 shadow-xl relative overflow-hidden">
         {/* Decorative glows */}
-        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-500 opacity-10 blur-2xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 opacity-10 blur-2xl pointer-events-none" />
 
         <div className="flex items-center justify-between mb-6 gap-2 w-full">
           <h3 className="text-sm sm:text-base font-bold app-theme-text flex items-center gap-1.5 whitespace-nowrap">
             <svg
-              className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 dark:text-purple-400"
+              className="w-4 h-4 sm:w-5 sm:h-5 text-slate-800 dark:text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -336,7 +338,7 @@ export default function Home() {
                       }}
                       className={`w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-white/15 transition-colors cursor-pointer ${
                         selectedChartSubject === item.id
-                          ? "text-purple-600 dark:text-purple-300 font-bold bg-purple-50 dark:bg-white/15"
+                          ? "text-black dark:text-white font-bold bg-black/5 dark:bg-white/15"
                           : "text-slate-700 dark:text-white/80"
                       }`}
                     >
@@ -400,8 +402,8 @@ export default function Home() {
             >
               <defs>
                 <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="rgba(168, 85, 247, 0.25)" />
-                  <stop offset="100%" stopColor="rgba(168, 85, 247, 0)" />
+                  <stop offset="0%" stopColor={isDarkMode ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.1)"} />
+                  <stop offset="100%" stopColor={isDarkMode ? "rgba(255, 255, 255, 0)" : "rgba(0, 0, 0, 0)"} />
                 </linearGradient>
               </defs>
 
@@ -484,7 +486,7 @@ export default function Home() {
               <path
                 d={pathD}
                 fill="none"
-                stroke="rgba(168, 85, 247, 1)"
+                stroke={isDarkMode ? "rgba(255, 255, 255, 0.9)" : "rgba(0, 0, 0, 0.9)"}
                 strokeWidth="2.5"
               />
 
@@ -503,7 +505,7 @@ export default function Home() {
                       cy={y}
                       r="4.5"
                       fill="white"
-                      stroke={item.color}
+                      stroke={isDarkMode ? "white" : "black"}
                       strokeWidth="2.5"
                     />
                     {(selectedChartSubject === item.id ||
@@ -513,7 +515,7 @@ export default function Home() {
                         cx={item.x}
                         cy={y}
                         r="10"
-                        fill={`${item.color}40`}
+                        fill={isDarkMode ? "rgba(255, 255, 255, 0.25)" : "rgba(0, 0, 0, 0.15)"}
                         stroke="none"
                         className="animate-ping"
                       />
@@ -546,21 +548,21 @@ export default function Home() {
               isSelected && (
                 <div
                   key={item.id}
-                  className={`absolute bg-gradient-to-r ${item.tooltipColor} border ${item.borderTooltip} rounded-xl py-1 px-2 text-center shadow-xl pointer-events-none select-none transition-all duration-300`}
+                  className="absolute bg-black/90 dark:bg-white/95 border border-black/10 dark:border-white/10 rounded-xl py-1 px-2 text-center shadow-xl pointer-events-none select-none transition-all duration-300"
                   style={{
                     left: `calc(${xPercent}% + 8px)`,
                     transform: "translate(-50%, -36px)",
                     top: `${y}px`,
                   }}
                 >
-                  <p className="text-[9px] font-bold text-white leading-none">
+                  <p className="text-[9px] font-bold text-white dark:text-black leading-none">
                     {item.label}
                   </p>
-                  <p className="text-[7px] text-white/80 font-semibold tracking-wide mt-0.5 uppercase">
+                  <p className="text-[7px] text-white/80 dark:text-black/80 font-semibold tracking-wide mt-0.5 uppercase">
                     Aktivitas: {item.activity}%
                   </p>
                   <div
-                    className={`absolute w-2 h-2 ${item.bgCaret} rotate-45 left-1/2 -translate-x-1/2 -bottom-1 border-r border-b ${item.borderTooltip}`}
+                    className="absolute w-2 h-2 bg-black dark:bg-white rotate-45 left-1/2 -translate-x-1/2 -bottom-1 border-r border-b border-black/10 dark:border-white/10"
                   />
                 </div>
               )
@@ -581,7 +583,7 @@ export default function Home() {
                   key={item.id}
                   className={`absolute transition-all duration-300 ${
                     isSelected
-                      ? `${item.activeColor} font-extrabold scale-110`
+                      ? "text-black dark:text-white font-extrabold scale-110"
                       : ""
                   }`}
                   style={{
@@ -617,13 +619,13 @@ export default function Home() {
     return (
       <div className="app-theme-card rounded-[2rem] p-6 shadow-2xl relative overflow-hidden flex flex-col gap-6 w-full">
         {/* Glow */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500 to-indigo-500 opacity-10 blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 opacity-10 blur-3xl pointer-events-none" />
 
         {/* Header (Top Bar) */}
         <div className="flex justify-between items-start w-full">
           <div className="flex items-center gap-3">
             {/* Target Heartbeat-style icon */}
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-300">
+            <div className="w-10 h-10 rounded-xl bg-black/10 dark:bg-white/10 border border-black/10 dark:border-white/15 flex items-center justify-center text-slate-800 dark:text-white">
               <svg
                 className="w-5 h-5 animate-pulse"
                 fill="none"
@@ -719,12 +721,12 @@ export default function Home() {
                   }
                   className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
                     day.active
-                      ? "bg-orange-500/10 dark:bg-white/10 border border-orange-500/20 dark:border-white/5 text-orange-500 shadow-inner"
+                      ? "bg-black/10 dark:bg-white/10 border border-black/15 dark:border-white/15 text-slate-850 dark:text-white shadow-inner"
                       : "bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-slate-300 dark:text-white/10"
                   }`}
                 >
                   <Flame
-                    className={`w-4 h-4 ${day.active ? "text-orange-500 fill-orange-500" : "text-slate-350 dark:text-white/20"}`}
+                    className={`w-4 h-4 ${day.active ? "text-slate-800 dark:text-white fill-slate-800 dark:fill-white" : "text-slate-350 dark:text-white/20"}`}
                   />
                 </motion.div>
               </div>
@@ -778,7 +780,7 @@ export default function Home() {
                 cx="20"
                 cy="20"
                 r="16"
-                className="stroke-orange-500 fill-none"
+                className="stroke-black dark:stroke-white fill-none"
                 strokeWidth="2.5"
                 strokeDasharray="100"
                 strokeDashoffset={100 - completionPercent}
@@ -786,7 +788,7 @@ export default function Home() {
             </svg>
             <Flame className={`w-4.5 h-4.5 animate-pulse ${
               calculateStreakStatus(statsData.lastStudyDate)
-                ? "text-orange-500 fill-orange-500"
+                ? "text-slate-800 dark:text-white fill-slate-800 dark:fill-white"
                 : "text-slate-300 dark:text-white/20 fill-none"
             }`} />
           </div>
@@ -798,11 +800,11 @@ export default function Home() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white relative overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[350px] h-[350px] rounded-full bg-purple-500/10 blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] rounded-full bg-blue-500/10 blur-[120px] pointer-events-none" />
+        <div className="absolute top-[-10%] left-[-10%] w-[350px] h-[350px] rounded-full bg-white/5 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] rounded-full bg-white/5 blur-[120px] pointer-events-none" />
         <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-xl shadow-2xl flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
-          <span className="text-xs font-bold uppercase tracking-widest text-purple-300 animate-pulse">Loading Studee...</span>
+          <div className="w-10 h-10 border-4 border-white/10 border-t-white rounded-full animate-spin" />
+          <span className="text-xs font-bold uppercase tracking-widest text-white/60 animate-pulse">Loading Studee...</span>
         </div>
       </div>
     );
@@ -845,8 +847,19 @@ export default function Home() {
             Studee
           </span>
 
-          {/* Right: Search & Notification Buttons */}
+          {/* Right: Search, Theme Toggle & Notification Buttons */}
           <div className="flex items-center gap-2.5">
+            <button
+              onClick={toggleTheme}
+              className="w-10 h-10 app-theme-card hover:bg-black/5 dark:hover:bg-white/5 rounded-full flex items-center justify-center text-[var(--text-color)] transition-all cursor-pointer active:scale-95"
+              title={isDarkMode ? "Ganti ke Light Mode" : "Ganti ke Dark Mode"}
+            >
+              {isDarkMode ? (
+                <Moon className="w-4.5 h-4.5 text-[var(--text-color)] fill-none" />
+              ) : (
+                <Sun className="w-4.5 h-4.5 text-[var(--text-color)] fill-none" />
+              )}
+            </button>
             <button
               onClick={() => setIsSearchOpen(true)}
               className="w-10 h-10 app-theme-card hover:bg-black/5 dark:hover:bg-white/5 rounded-full flex items-center justify-center text-[var(--text-color)] transition-all cursor-pointer active:scale-95"
@@ -1055,11 +1068,11 @@ export default function Home() {
             </div>
             {/* CARD 1: Profil Pengguna */}
             <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-3xl p-6 shadow-xl relative overflow-hidden text-center">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 opacity-10 blur-2xl pointer-events-none" />
+              <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 opacity-10 blur-2xl pointer-events-none" />
 
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/20 shadow-md">
+              <div className="w-20 h-20 bg-black/10 dark:bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-black/10 dark:border-white/20 shadow-md">
                 <svg
-                  className="w-10 h-10 text-white"
+                  className="w-10 h-10 text-black dark:text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1075,7 +1088,7 @@ export default function Home() {
               <h2 className="text-2xl font-bold text-white mb-1">
                 Pengguna Konsisten
               </h2>
-              <p className="text-sm text-purple-200/60 mb-4 font-medium">
+              <p className="text-sm text-slate-500 dark:text-white/40 mb-4 font-medium">
                 user@example.com
               </p>
 
@@ -1085,7 +1098,7 @@ export default function Home() {
                   <span className="text-xs text-white/40 block font-semibold uppercase tracking-wider">
                     Total Streak
                   </span>
-                  <span className="text-xl font-bold text-orange-400 mt-1 block">
+                  <span className="text-xl font-bold text-white mt-1 block">
                     <AnimatedNumber value={totalStreak} /> Hari 🔥
                   </span>
                 </div>
@@ -1094,7 +1107,7 @@ export default function Home() {
                   <span className="text-xs text-white/40 block font-semibold uppercase tracking-wider">
                     Level Belajar
                   </span>
-                  <span className="text-xl font-bold text-purple-300 mt-1 block">
+                  <span className="text-xl font-bold text-white mt-1 block">
                     Level <AnimatedNumber value={12} /> 🏆
                   </span>
                 </div>
@@ -1136,10 +1149,10 @@ export default function Home() {
         ) : (
           <>
             {/* Featured Class Card */}
-            <div className="w-full bg-slate-900 dark:bg-white/10 backdrop-blur-xl border border-slate-800 dark:border-white/10 rounded-[2rem] p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[170px] hover:scale-[1.01] transition-all z-10">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500 to-indigo-500 opacity-20 blur-2xl pointer-events-none" />
+            <div className="w-full bg-black/90 dark:bg-white/10 backdrop-blur-xl border border-black/20 dark:border-white/10 rounded-[2rem] p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[170px] hover:scale-[1.01] hover:shadow-[0_0_20px_rgba(255,255,255,0.06)] transition-all z-10">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/3 blur-2xl pointer-events-none" />
               <div className="flex flex-col gap-1.5 z-10">
-                <span className="text-[9px] font-extrabold uppercase tracking-widest text-purple-200/90 bg-white/10 px-2.5 py-1 rounded-full self-start border border-white/10">
+                <span className="text-[9px] font-extrabold uppercase tracking-widest text-white/90 bg-white/10 px-2.5 py-1 rounded-full self-start border border-white/10">
                   25+ Lectures • 45 Enrolled
                 </span>
                 <h3 className="text-xl font-extrabold text-white mt-1 leading-tight tracking-tight max-w-[200px] sm:max-w-xs">
@@ -1147,12 +1160,12 @@ export default function Home() {
                 </h3>
               </div>
               <div className="flex items-center justify-between mt-4 z-10">
-                <p className="text-[10px] text-purple-200/70 font-medium">
+                <p className="text-[10px] text-white/70 font-medium">
                   Mulai belajar kelas live hari ini
                 </p>
                 <ProtectedCourse subjectId="ui-ux" onClick={() => alert("Mengarah ke kelas UI/UX Live!")}>
                   <button
-                    className="bg-white text-purple-700 hover:bg-purple-50 rounded-full px-5 py-2 text-xs font-bold shadow-md transition-all active:scale-95 cursor-pointer"
+                    className="bg-white text-black hover:bg-white/90 rounded-full px-5 py-2 text-xs font-bold shadow-md transition-all active:scale-95 cursor-pointer"
                   >
                     Lanjut Belajar
                   </button>
@@ -1168,7 +1181,7 @@ export default function Home() {
                   onClick={() => setSelectedFilter(filter)}
                   className={`px-5 py-2.5 rounded-full text-xs font-semibold transition-all duration-300 ease-in-out backdrop-blur-md whitespace-nowrap cursor-pointer active:scale-95 ${
                     selectedFilter === filter
-                      ? "bg-gradient-to-r from-purple-500 to-indigo-500 border border-purple-400/30 text-white shadow-md scale-[1.02]"
+                      ? "bg-black dark:bg-white border border-black/10 dark:border-white/15 text-white dark:text-black shadow-[0_0_15px_rgba(255,255,255,0.12)] scale-[1.02]"
                       : "bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/5 dark:border-white/10 text-slate-700 dark:text-white/60 hover:text-black dark:hover:text-white"
                   }`}
                 >
@@ -1195,17 +1208,17 @@ export default function Home() {
                               animate={{ opacity: 1, scale: 1, y: 0 }}
                               exit={{ opacity: 0, scale: 0.96, y: 10 }}
                               transition={{ duration: 0.3, ease: "easeOut" }}
-                              className="w-full app-theme-card rounded-3xl p-4.5 shadow-xl relative overflow-hidden transition-all duration-300 ease-in-out hover:scale-[1.02] hover:bg-black/5 dark:hover:bg-white/15 hover:border-slate-350 dark:hover:border-white/30 active:scale-[0.98] group flex flex-col justify-between min-h-[180px] cursor-pointer"
+                              className="w-full app-theme-card rounded-3xl p-4.5 shadow-xl relative overflow-hidden hover:scale-[1.02] hover:bg-black/5 dark:hover:bg-white/15 hover:border-slate-350 dark:hover:border-white/30 hover:shadow-[0_0_20px_rgba(255,255,255,0.08)] active:scale-[0.98] group flex flex-col justify-between min-h-[180px] cursor-pointer transition-all duration-300"
                             >
                               {/* Glow */}
                               <div
-                                className={`absolute top-0 right-0 w-16 h-16 rounded-full bg-gradient-to-br ${subject.color} opacity-10 blur-xl pointer-events-none group-hover:opacity-20 transition-opacity`}
+                                className="absolute top-0 right-0 w-16 h-16 rounded-full bg-white/5 blur-xl pointer-events-none group-hover:opacity-10 transition-opacity"
                               />
 
                               {/* Top: Icon & Favorite */}
                               <div className="flex justify-between items-start w-full">
                                 <div
-                                  className={`w-9 h-9 rounded-xl bg-gradient-to-br ${subject.color || "from-blue-400 to-indigo-500"} flex items-center justify-center shadow-md flex-shrink-0`}
+                                  className="w-9 h-9 rounded-xl bg-black/10 dark:bg-white/10 border border-black/15 dark:border-white/15 flex items-center justify-center shadow-md flex-shrink-0"
                                 >
                                   {(() => {
                                     const iconName = subject.icon || "";
@@ -1213,18 +1226,18 @@ export default function Home() {
                                     const name = (subject.name || subject.title || "").toLowerCase();
                                     
                                     if (iconName === "GraduationCap" || category.includes("math") || category.includes("matematika") || name.includes("math") || name.includes("matematika")) {
-                                      return <GraduationCap className="w-5 h-5 text-white" />;
+                                      return <GraduationCap className="w-5 h-5 text-black dark:text-white" />;
                                     }
                                     if (iconName === "FlaskConical" || category.includes("science") || category.includes("ipa") || name.includes("science") || name.includes("ipa")) {
-                                      return <FlaskConical className="w-5 h-5 text-white" />;
+                                      return <FlaskConical className="w-5 h-5 text-black dark:text-white" />;
                                     }
                                     if (iconName === "Code" || category.includes("coding") || category.includes("program") || name.includes("coding") || name.includes("program")) {
-                                      return <Code className="w-5 h-5 text-white" />;
+                                      return <Code className="w-5 h-5 text-black dark:text-white" />;
                                     }
                                     if (iconName === "Globe" || category.includes("english") || category.includes("inggris") || name.includes("english") || name.includes("inggris")) {
-                                      return <Globe className="w-5 h-5 text-white" />;
+                                      return <Globe className="w-5 h-5 text-black dark:text-white" />;
                                     }
-                                    return <GraduationCap className="w-5 h-5 text-white" />;
+                                    return <GraduationCap className="w-5 h-5 text-black dark:text-white" />;
                                   })()}
                                 </div>
                                 {subject.isFavorite && (
@@ -1237,11 +1250,9 @@ export default function Home() {
                                     </svg>
                                   </span>
                                 )}
-                              </div>
-
-                              {/* Middle: Subject Title & Level/Duration */}
+                                                            {/* Middle: Subject Title & Level/Duration */}
                               <div className="mt-3.5 flex flex-col">
-                                <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-200 transition-colors text-sm line-clamp-1 leading-tight">
+                                <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-black dark:group-hover:text-white transition-colors text-sm line-clamp-1 leading-tight">
                                   {subject.name || subject.title}
                                 </h3>
 
@@ -1253,8 +1264,8 @@ export default function Home() {
 
                                 {/* Certificate Icon */}
                                 {subject.hasCertificate && (
-                                  <div className="flex items-center gap-1 text-[8px] text-purple-600 dark:text-purple-300 font-bold mt-1.5">
-                                    <Award className="w-3 h-3 text-purple-650 dark:text-purple-300 flex-shrink-0" />
+                                  <div className="flex items-center gap-1 text-[8px] text-slate-800 dark:text-white font-bold mt-1.5">
+                                    <Award className="w-3 h-3 text-slate-800 dark:text-white flex-shrink-0" />
                                     <span>Sertifikat</span>
                                   </div>
                                 )}
@@ -1268,11 +1279,11 @@ export default function Home() {
                                 </div>
                                 <div className="w-full bg-slate-200 dark:bg-white/10 rounded-full h-1 border border-slate-350/30 dark:border-white/5 overflow-hidden">
                                   <div
-                                    className={`bg-gradient-to-r ${subject.color} h-full rounded-full transition-all duration-500`}
+                                    className="bg-black dark:bg-white h-full rounded-full transition-all duration-500"
                                     style={{ width: `${subject.progress}%` }}
                                   />
                                 </div>
-                              </div>
+                              </div>  </div>
                             </motion.div>
                           </ProtectedCourse>
                         ))}
@@ -1284,7 +1295,7 @@ export default function Home() {
                     <div className="flex justify-center mt-2 w-full">
                       <button
                         onClick={() => setShowAllSubjects(!showAllSubjects)}
-                        className="px-6 py-3 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/10 dark:border-white/10 rounded-full text-xs font-bold text-purple-650 dark:text-purple-300 hover:text-purple-750 dark:hover:text-white transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-md"
+                        className="px-6 py-3 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/10 dark:border-white/10 rounded-full text-xs font-bold text-slate-800 dark:text-white hover:text-black dark:hover:text-white transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-md"
                       >
                         {showAllSubjects
                           ? "Tampilkan Lebih Sedikit"
@@ -1374,9 +1385,9 @@ export default function Home() {
 
         {/* Header Drawer: User Profile Info */}
         <div className="flex flex-col items-center text-center mt-6">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center border border-black/5 dark:border-white/20 shadow-md mb-3">
+          <div className="w-16 h-16 bg-black/10 dark:bg-white/10 rounded-full flex items-center justify-center border border-black/10 dark:border-white/20 shadow-md mb-3">
             <svg
-              className="w-8 h-8 text-white/90"
+              className="w-8 h-8 text-black dark:text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -1723,7 +1734,7 @@ export default function Home() {
                       setNotifications([]);
                       setExpandedNotificationId(null);
                     }}
-                    className="w-full py-3.5 rounded-2xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-650 dark:text-purple-300 hover:text-purple-750 dark:hover:text-purple-200 text-xs font-bold transition-all active:scale-[0.99] cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-purple-200 dark:shadow-purple-950/20"
+                    className="w-full py-3.5 rounded-2xl bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10 border border-black/10 dark:border-white/10 text-slate-800 dark:text-white text-xs font-bold transition-all active:scale-[0.99] cursor-pointer flex items-center justify-center gap-1.5 shadow-md"
                   >
                     Clear All Notifications
                   </button>
@@ -1747,7 +1758,7 @@ export default function Home() {
                 setIsSearchOpen(false);
                 setSearchQuery("");
               }}
-              className="fixed inset-0 bg-purple-950/10 backdrop-blur-xl z-50 cursor-pointer"
+              className="fixed inset-0 bg-black/20 backdrop-blur-xl z-50 cursor-pointer"
             />
 
             {/* Centered Floating Glassmorphic Card */}
@@ -1801,7 +1812,7 @@ export default function Home() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   autoFocus
-                  className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-3.5 pl-11 pr-5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-purple-400 focus:bg-white/8 transition-all shadow-inner"
+                  className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-3.5 pl-11 pr-5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-[var(--text-color)] focus:bg-white/8 transition-all shadow-inner"
                 />
                 <svg
                   className="w-4.5 h-4.5 text-slate-400 dark:text-white/30 absolute left-4 top-1/2 -translate-y-1/2"
@@ -1833,17 +1844,17 @@ export default function Home() {
                         setSearchQuery("");
                         router.push(`/lesson/${result.subjectId}`);
                       }}
-                      className="w-full p-3.5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 hover:border-purple-300 dark:hover:border-purple-500/20 text-left transition-all cursor-pointer flex items-center justify-between group shadow-sm"
+                      className="w-full p-3.5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 hover:border-[var(--text-color)]/25 text-left transition-all cursor-pointer flex items-center justify-between group shadow-sm"
                     >
                       <div className="flex items-center gap-3">
                         {/* Subject Icon color indicator */}
                         <div
-                          className={`w-8 h-8 rounded-lg bg-gradient-to-br ${result.subjectColor} flex items-center justify-center text-white text-[9px] font-extrabold shadow-md`}
+                          className="w-8 h-8 rounded-lg bg-black/10 dark:bg-white/10 border border-black/10 dark:border-white/10 text-slate-800 dark:text-white flex items-center justify-center text-[9px] font-extrabold shadow-md"
                         >
                           {result.type === "subject" ? "Kls" : "Mtr"}
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-purple-650 dark:group-hover:text-purple-300 transition-colors leading-tight">
+                          <span className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-[var(--text-color)] transition-colors leading-tight">
                             {result.title}
                           </span>
                           <span className="text-[9px] text-slate-500 dark:text-white/40 font-semibold mt-0.5">
@@ -1856,7 +1867,7 @@ export default function Home() {
 
                       {/* Arrow indicator */}
                       <svg
-                        className="w-4 h-4 text-slate-400 dark:text-white/30 group-hover:text-purple-400 group-hover:translate-x-0.5 transition-all"
+                        className="w-4 h-4 text-slate-400 dark:text-white/30 group-hover:text-[var(--text-color)] group-hover:translate-x-0.5 transition-all"
                         fill="none"
                         stroke="currentColor"
                         strokeWidth="2.5"
