@@ -21,10 +21,12 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCourseData } from "../../lib/CourseDataContext";
+import FaceScannerModal from "../../components/FaceScannerModal";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { statsData, courseData } = useCourseData();
+  const { statsData, courseData, hasFaceId, setHasFaceId } = useCourseData();
+  const [showFaceScanner, setShowFaceScanner] = useState(false);
   const [activeTab, setActiveTab] = useState("feed"); // feed, challenge, badge
   const [isAdmin, setIsAdmin] = useState(false);
   const [userName, setUserName] = useState("Pengguna Konsisten");
@@ -348,9 +350,52 @@ export default function ProfilePage() {
       });
   };
 
+  const handleFaceRegisterSuccess = (data) => {
+    setShowFaceScanner(false);
+    setHasFaceId(true);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("hasFaceId", "true");
+    }
+  };
+
+  const handleDeleteFaceID = async () => {
+    if (!window.confirm("Apakah Anda yakin ingin menghapus data Face ID Anda?")) return;
+
+    try {
+      const res = await fetch("/api/auth/face/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: userEmail, faceDescriptor: [] }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setHasFaceId(false);
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("hasFaceId");
+        }
+        alert("Face ID berhasil dinonaktifkan.");
+      } else {
+        alert(data.error || "Gagal menonaktifkan Face ID.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan koneksi ke server.");
+    }
+  };
+
   useEffect(() => {
     setMounted(true);
     if (typeof window === "undefined") return;
+
+    const sessionActive = sessionStorage.getItem("sessionActive") === "true";
+    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+    
+    if (loggedIn && !sessionActive) {
+      localStorage.removeItem("isLoggedIn");
+      document.cookie = "isLoggedIn=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      window.location.href = "/login";
+      return;
+    }
 
     const storedName = localStorage.getItem("userName");
     const storedEmail = localStorage.getItem("userEmail");
@@ -588,6 +633,42 @@ export default function ProfilePage() {
           >
             Edit Profile
           </button>
+        </div>
+
+        {/* Face ID Security Section */}
+        <div className="w-full app-theme-card rounded-3xl p-5 shadow-lg border border-[var(--border-color)] relative overflow-hidden">
+          <div className="flex items-center justify-between z-10 relative">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M10 21h4m-2-3v3m-3-9a3 3 0 116 0 3 3 0 01-6 0zm-3 8h12a3 3 0 003-3V9a3 3 0 00-3-3H6a3 3 0 00-3 3v6a3 3 0 003 3z" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h4 className="text-sm font-bold text-[var(--text-color)]">Autentikasi Face ID</h4>
+                <p className="text-[10px] app-theme-text-muted">
+                  {hasFaceId ? "Face ID aktif di akun ini." : "Login instan menggunakan kamera."}
+                </p>
+              </div>
+            </div>
+            {hasFaceId ? (
+              <button
+                type="button"
+                onClick={handleDeleteFaceID}
+                className="py-2 px-4 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl text-[10px] font-bold transition-all cursor-pointer"
+              >
+                Hapus
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowFaceScanner(true)}
+                className="py-2 px-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 rounded-xl text-[10px] font-bold transition-all cursor-pointer"
+              >
+                Aktifkan
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Navigation Tabs */}
@@ -1774,6 +1855,14 @@ export default function ProfilePage() {
           </AnimatePresence>
         </div>
       </div>
+      {showFaceScanner && (
+        <FaceScannerModal
+          mode="register"
+          email={userEmail}
+          onClose={() => setShowFaceScanner(false)}
+          onSuccess={handleFaceRegisterSuccess}
+        />
+      )}
     </main>
   );
 }

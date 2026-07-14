@@ -11,6 +11,7 @@ export function CourseDataProvider({ children }) {
     streakCount: 5,
     lastStudyDate: "2026-07-01",
   });
+  const [hasFaceId, setHasFaceId] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
@@ -43,6 +44,14 @@ export function CourseDataProvider({ children }) {
         });
 
         setCourseData(mergedCourses);
+        setHasFaceId(!!data.hasFaceId);
+        if (typeof window !== "undefined") {
+          if (data.hasFaceId) {
+            localStorage.setItem("hasFaceId", "true");
+          } else {
+            localStorage.removeItem("hasFaceId");
+          }
+        }
         setStatsData(data.stats || {
           totalStudyTime: 185,
           streakCount: 5,
@@ -57,6 +66,17 @@ export function CourseDataProvider({ children }) {
   };
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const sessionActive = sessionStorage.getItem("sessionActive") === "true";
+      const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+      
+      if (loggedIn && !sessionActive) {
+        localStorage.removeItem("isLoggedIn");
+        document.cookie = "isLoggedIn=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        window.location.href = "/login";
+        return;
+      }
+    }
     fetchData();
   }, []);
 
@@ -89,6 +109,8 @@ export function CourseDataProvider({ children }) {
         courseData,
         statsData,
         loading,
+        hasFaceId,
+        setHasFaceId,
         updateCourseProgress,
         refreshData: fetchData,
       }}

@@ -3,10 +3,21 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import FaceScannerModal from "../../components/FaceScannerModal";
 
 export default function Login() {
   const [email, setEmail] = useState("");
+  const [showFaceScanner, setShowFaceScanner] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const hasFace = localStorage.getItem("hasFaceId") === "true";
+      if (hasFace) {
+        setShowFaceScanner(true);
+      }
+    }
+  }, []);
 
   const handleGoogleLoginClick = () => {
     /* global google */
@@ -41,6 +52,7 @@ export default function Login() {
               }
 
               localStorage.setItem("isLoggedIn", "true");
+              sessionStorage.setItem("sessionActive", "true");
               document.cookie = "isLoggedIn=true; path=/";
               localStorage.setItem("hasVisitedOnboarding", "true");
 
@@ -79,6 +91,7 @@ export default function Login() {
     localStorage.setItem("userEmail", email);
     localStorage.setItem("userName", email.split("@")[0]);
     localStorage.setItem("isLoggedIn", "true");
+    sessionStorage.setItem("sessionActive", "true");
     document.cookie = "isLoggedIn=true; path=/";
     localStorage.setItem("hasVisitedOnboarding", "true");
 
@@ -95,10 +108,34 @@ export default function Login() {
     localStorage.setItem("userRole", "user");
     document.cookie = "userRole=user; path=/";
     localStorage.setItem("isLoggedIn", "true");
+    sessionStorage.setItem("sessionActive", "true");
     document.cookie = "isLoggedIn=true; path=/";
     localStorage.setItem("hasVisitedOnboarding", "true");
 
     // Read redirect parameter
+    let redirectTo = "/dashboard";
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      redirectTo = params.get("redirectTo") || "/dashboard";
+    }
+    router.push(redirectTo);
+  };
+
+  const handleFaceLoginSuccess = (data) => {
+    setShowFaceScanner(false);
+    
+    // Store in localStorage
+    localStorage.setItem("userName", data.user.name);
+    localStorage.setItem("userEmail", data.user.email);
+    localStorage.setItem("userRole", data.user.role);
+    document.cookie = `userRole=${data.user.role}; path=/`;
+
+    localStorage.setItem("isLoggedIn", "true");
+    sessionStorage.setItem("sessionActive", "true");
+    document.cookie = "isLoggedIn=true; path=/";
+    localStorage.setItem("hasVisitedOnboarding", "true");
+
+    // Redirect to dashboard
     let redirectTo = "/dashboard";
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
@@ -185,8 +222,27 @@ export default function Login() {
             </svg>
             <span>Login dengan Google</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setShowFaceScanner(true)}
+            className="w-full app-theme-card hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-color)] rounded-2xl py-3.5 px-4 font-semibold transition-all flex items-center justify-center gap-3 cursor-pointer shadow-lg active:scale-[0.98] hover:shadow-[0_0_15px_rgba(255,255,255,0.06)] border border-emerald-500/20"
+          >
+            <svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M10 21h4m-2-3v3m-3-9a3 3 0 116 0 3 3 0 01-6 0zm-3 8h12a3 3 0 003-3V9a3 3 0 00-3-3H6a3 3 0 00-3 3v6a3 3 0 003 3z" />
+            </svg>
+            <span>Masuk dengan Face ID</span>
+          </button>
         </div>
       </div>
+
+      {showFaceScanner && (
+        <FaceScannerModal
+          mode="login"
+          onClose={() => setShowFaceScanner(false)}
+          onSuccess={handleFaceLoginSuccess}
+        />
+      )}
     </main>
   );
 }

@@ -8,11 +8,12 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  email     String   @unique
-  name      String?
-  streak    Int      @default(0)
-  logs      DailyLog[]
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  email          String   @unique
+  name           String?
+  streak         Int      @default(0)
+  logs           DailyLog[]
+  faceDescriptor Float[]
 }
 
 model DailyLog {

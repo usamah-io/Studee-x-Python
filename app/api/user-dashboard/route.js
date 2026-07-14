@@ -9,10 +9,11 @@ export async function GET(request) {
     let totalStudyTime = 0;
     let streakCount = 0;
     let lastStudyDate = null;
+    let dbUser = null;
 
     if (email) {
       // Find or create user
-      let dbUser = await prisma.user.findUnique({
+      dbUser = await prisma.user.findUnique({
         where: { email },
         include: { logs: true }
       });
@@ -131,6 +132,7 @@ export async function GET(request) {
         streakCount: streakCount || 2,         // Fallback to initial dummy data if newly created user
         lastStudyDate: lastStudyDate || "2026-07-01",
       },
+      hasFaceId: dbUser ? dbUser.faceDescriptor.length > 0 : false,
       courseList,
     };
 

@@ -9,7 +9,7 @@ export default function RootPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
 
   useEffect(() => {
-    const logged = localStorage.getItem("isLoggedIn") === "true";
+    const logged = typeof document !== "undefined" && document.cookie.includes("isLoggedIn=true");
     const hasVisited = localStorage.getItem("hasVisitedOnboarding") === "true";
     
     if (logged || hasVisited) {

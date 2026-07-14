@@ -123,10 +123,21 @@ export default function Home() {
   const { streakData, totalStreak } = useStreak();
 
   useEffect(() => {
-    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
-    setTimeout(() => {
-      setIsLoggedIn(loggedIn);
-    }, 0);
+    if (typeof window !== "undefined") {
+      const sessionActive = sessionStorage.getItem("sessionActive") === "true";
+      const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+      
+      if (loggedIn && !sessionActive) {
+        localStorage.removeItem("isLoggedIn");
+        document.cookie = "isLoggedIn=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        window.location.href = "/login";
+        return;
+      }
+      
+      setTimeout(() => {
+        setIsLoggedIn(loggedIn);
+      }, 0);
+    }
 
     // Fetch dynamic live class link
     fetch("/api/live-class")
