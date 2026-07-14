@@ -12,12 +12,9 @@ export default function RootPage() {
     const logged = localStorage.getItem("isLoggedIn") === "true";
     const hasVisited = localStorage.getItem("hasVisitedOnboarding") === "true";
     
-    if (logged) {
+    if (logged || hasVisited) {
       setIsLoggedIn(true);
       router.push("/dashboard");
-    } else if (hasVisited) {
-      setIsLoggedIn(true); // Treat as transitioning/loading state to show spinner
-      router.push("/login");
     } else {
       setIsLoggedIn(false);
     }

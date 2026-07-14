@@ -1,7 +1,14 @@
+const withPWA = require("@ducanh2912/next-pwa").default({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
+  register: true,
+  skipWaiting: true,
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Tambahkan baris di bawah ini
   allowedDevOrigins: ["192.168.1.136"],
+  turbopack: {},
 };
 
-module.exports = nextConfig;
+module.exports = withPWA(nextConfig);

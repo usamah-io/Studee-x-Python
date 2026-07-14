@@ -179,7 +179,7 @@ export function StreakProvider({ children }) {
                 {/* Main Flame Card Container */}
                 <motion.div
                   initial={{ scale: 0.3, rotate: -25, opacity: 0 }}
-                  animate={{ scale: [1.3, 0.95, 1], rotate: 0, opacity: 1 }}
+                  animate={{ scale: 1, rotate: 0, opacity: 1 }}
                   transition={{ type: "spring", damping: 10, stiffness: 120, delay: 0.1 }}
                   className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center border border-white/10 shadow-lg relative z-10"
                 >

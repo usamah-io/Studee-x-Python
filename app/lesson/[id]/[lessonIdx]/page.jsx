@@ -23,151 +23,7 @@ import {
 } from "lucide-react";
 import { useStreak } from "../../../../lib/StreakContext";
 import { useTheme } from "../../../../lib/ThemeContext";
-
-const lessonsData = {
-  mtk: {
-    id: "mtk",
-    name: "Matematika (MTK)",
-    level: "Intermediate",
-    syllabus: [
-      { 
-        title: "Pengenalan Aljabar Linear", 
-        duration: "45 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=fNk_zzaMoEs",
-        notes: "Aljabar Linear mempelajari sistem persamaan linear, vektor, matriks, dan ruang vektor. Konsep ini adalah pilar utama di balik pemrograman grafis 3D, kecerdasan buatan (AI), dan analisis data modern."
-      },
-      { 
-        title: "Matriks & Transformasi Ruang", 
-        duration: "60 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=kYB8IZa5AuE",
-        notes: "Matriks digunakan untuk mentransformasikan objek grafis (translasi, rotasi, scaling) dalam ruang 2D dan 3D. Di sini Anda akan memahami konsep Eigenvalue dan Eigenvector secara mendalam."
-      },
-      { 
-        title: "Kalkulus: Turunan Pertama", 
-        duration: "50 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=juKGHh3_DNY",
-        notes: "Kalkulus diferensial berfokus pada laju perubahan instan dari suatu fungsi. Konsep turunan pertama sangat krusial dalam algoritma optimasi seperti Gradient Descent pada Machine Learning."
-      },
-      { 
-        title: "Kalkulus: Integral & Luas Daerah", 
-        duration: "75 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=fNk_zzaMoEs",
-        notes: "Integral adalah operasi kebalikan dari turunan yang memungkinkan kita menghitung akumulasi total atau luas daerah di bawah kurva non-linear dengan presisi matematis tinggi."
-      },
-      { 
-        title: "Probabilitas Dasar & Distribusi", 
-        duration: "90 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=kYB8IZa5AuE",
-        notes: "Teori probabilitas mengukur tingkat ketidakpastian suatu peristiwa. Kita akan mengeksplorasi Distribusi Normal, Teorema Bayes, dan bagaimana data statistik membantu pengambilan keputusan."
-      },
-    ],
-  },
-  science: {
-    id: "science",
-    name: "Science (IPA)",
-    level: "Advanced",
-    syllabus: [
-      { 
-        title: "Dasar Fisika Quantum", 
-        duration: "60 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=URUJD5NEXC8",
-        notes: "Fisika Quantum mempelajari mekanika partikel pada skala sub-atomik. Konsep probabilitas keadaan menggantikan determinisme fisika klasik, membuka pintu bagi komputasi kuantum masa depan."
-      },
-      { 
-        title: "Dualisme Gelombang Partikel", 
-        duration: "75 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=URUJD5NEXC8",
-        notes: "Percobaan celah ganda membuktikan bahwa partikel seperti elektron bertingkah sebagai gelombang ketika tidak diamati, dan runtuh menjadi materi padat saat proses observasi dilakukan."
-      },
-      { 
-        title: "Struktur & Fungsi Sel Eukariotik", 
-        duration: "55 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=URUJD5NEXC8",
-        notes: "Mempelajari perbedaan mendasar sel hewan dan tumbuhan. Organel seperti Mitokondria bertindak sebagai generator energi (ATP), sementara Nukleus menyimpan blueprint DNA makhluk hidup."
-      },
-      { 
-        title: "Sintesis Protein & Asam Nukleat", 
-        duration: "80 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=URUJD5NEXC8",
-        notes: "Proses transkripsi dan translasi DNA menjadi rantai asam amino (protein) yang menyusun tubuh kita. Pemahaman materi genetik ini krusial untuk bioteknologi dan pengembangan vaksin."
-      },
-      { 
-        title: "Termodinamika Sistem Tertutup", 
-        duration: "90 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=URUJD5NEXC8",
-        notes: "Hukum kekekalan energi dan entropi dalam wadah tertutup. Memahami perpindahan panas, usaha kerja mekanik, serta efisiensi ideal mesin Carnot dalam memproses daya energi."
-      },
-    ],
-  },
-  coding: {
-    id: "coding",
-    name: "Coding & Algoritma",
-    level: "Beginner to Pro",
-    syllabus: [
-      { 
-        title: "Pengenalan Struktur Data & Array", 
-        duration: "30 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
-        notes: "Array dan List adalah struktur data linear dasar. Di sini Anda akan belajar kompleksitas waktu (Big O) pencarian, penyisipan, dan penghapusan data."
-      },
-      { 
-        title: "Algoritma Rekursi & Dynamic Programming", 
-        duration: "90 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
-        notes: "Rekursi memecah masalah besar menjadi sub-masalah kecil. Dynamic Programming mengoptimasi rekursi dengan menyimpan hasil perhitungan (memoization)."
-      },
-      { 
-        title: "Pengenalan Routing Dinamis Next.js", 
-        duration: "45 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
-        notes: "Pelajari cara kerja routing folder-based di Next.js App Router, menangkap segmen dinamis [id], dan menyajikan data berbasis parameter URL secara cepat."
-      },
-      { 
-        title: "Manajemen State dengan React Hooks", 
-        duration: "60 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
-        notes: "Memahami siklus hidup komponen React melalui useState, useEffect, dan useContext guna membangun antarmuka web interaktif yang reaktif."
-      },
-      { 
-        title: "Deployment Aplikasi ke Vercel", 
-        duration: "40 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk",
-        notes: "Panduan lengkap mendeploy aplikasi Next.js ke Vercel secara otomatis dari repositori GitHub, mengkonfigurasi environment variables, dan memantau analitik."
-      },
-    ],
-  },
-  english: {
-    id: "english",
-    name: "Bahasa Inggris",
-    level: "Beginner",
-    syllabus: [
-      { 
-        title: "Penyusunan Kalimat Akademik", 
-        duration: "45 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=juKGHh3_DNY",
-        notes: "Mempelajari struktur kalimat formal (compound & complex sentences) untuk esai ilmiah, menyusun argumen yang logis, dan menghindari bias bahasa."
-      },
-      { 
-        title: "Penguasaan 16 Tenses Utama", 
-        duration: "90 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=juKGHh3_DNY",
-        notes: "Memahami kapan harus menggunakan Simple Past, Present Perfect, atau Future Continuous dalam percakapan sehari-hari maupun dokumen bisnis resmi."
-      },
-      { 
-        title: "Teknik Presentasi & Public Speaking", 
-        duration: "60 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=juKGHh3_DNY",
-        notes: "Tips mengatasi kecemasan berbicara di depan umum, intonasi vokal, bahasa tubuh, serta pemilihan kosakata transisi profesional untuk meyakinkan audiens dalam bahasa Inggris."
-      },
-      { 
-        title: "Percakapan Formal di Tempat Kerja", 
-        duration: "50 Menit",
-        videoUrl: "https://www.youtube.com/watch?v=juKGHh3_DNY",
-        notes: "Mempraktikkan negosiasi bisnis, mengirim email formal, serta tata bahasa sopan (politeness markers) saat berinteraksi dengan kolega kerja maupun klien internasional."
-      },
-    ],
-  },
-};
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function LessonPlayerPage() {
   const params = useParams();
@@ -178,6 +34,7 @@ export default function LessonPlayerPage() {
   const id = params?.id;
   const lessonIdx = parseInt(params?.lessonIdx || "0", 10);
   const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Media type state: 'video' (Mode A) or 'pdf' (Mode B)
   const [mediaType, setMediaType] = useState("video");
@@ -185,21 +42,23 @@ export default function LessonPlayerPage() {
   const [zoom, setZoom] = useState(100);
   const [isPdfFullScreen, setIsPdfFullScreen] = useState(false);
 
-  const [lesson, setLesson] = useState(() => {
-    return lessonsData[id] || lessonsData.coding;
-  });
+  const [lesson, setLesson] = useState(null);
+  const [currentMateri, setCurrentMateri] = useState(null);
 
-  const [currentMateri, setCurrentMateri] = useState(() => {
-    const parentLesson = lessonsData[id] || lessonsData.coding;
-    return parentLesson.syllabus[lessonIdx] || parentLesson.syllabus[0];
-  });
+  // Student Quiz Player States
+  const [quizActive, setQuizActive] = useState(false);
+  const [currentQIdx, setCurrentQIdx] = useState(0);
+  const [selectedAnswers, setSelectedAnswers] = useState({}); // { [qIdx]: selectedOptionString }
+  const [quizResult, setQuizResult] = useState(null); // { score, passed, correctCount }
 
   useEffect(() => {
     setMounted(true);
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && id) {
+      setLoading(true);
       fetch("/api/subjects")
         .then((res) => res.json())
         .then((subjects) => {
+          setLoading(false);
           if (subjects && !subjects.error) {
             const found = subjects.find((s) => String(s.id) === String(id));
             if (found) {
@@ -219,7 +78,8 @@ export default function LessonPlayerPage() {
                 id: found.id,
                 name: found.title,
                 level: found.level || "Beginner",
-                syllabus: mappedSyllabus
+                syllabus: mappedSyllabus,
+                questions: found.questions || []
               });
 
               setCurrentMateri({
@@ -229,15 +89,47 @@ export default function LessonPlayerPage() {
                 pdfUrl: targetMateri.pdfUrl || found.driveLink || "",
                 notes: found.description || "Silakan pelajari materi dokumen di bawah secara mendalam."
               });
+            } else {
+              setLesson(null);
             }
           }
         })
-        .catch((err) => console.error("Error loading dynamic subject details inside LessonPlayer:", err));
+        .catch((err) => {
+          console.error("Error loading dynamic subject details inside LessonPlayer:", err);
+          setLoading(false);
+          setLesson(null);
+        });
     }
   }, [id, lessonIdx]);
 
   if (!mounted) {
     return null;
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white relative overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[350px] h-[350px] rounded-full bg-white/5 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none" />
+        <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-xl shadow-2xl flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-4 border-white/10 border-t-white rounded-full animate-spin" />
+          <span className="text-xs font-bold uppercase tracking-widest text-white/70 animate-pulse">Memuat Player...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!lesson || !currentMateri) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white p-6 relative overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[350px] h-[350px] rounded-full bg-white/5 blur-[120px] pointer-events-none" />
+        <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 max-w-sm w-full text-center backdrop-blur-xl shadow-2xl flex flex-col items-center gap-6">
+          <h3 className="text-lg font-black uppercase tracking-wider text-red-400">Materi Tidak Ditemukan</h3>
+          <p className="text-xs text-white/60 leading-relaxed">Materi pelajaran yang Anda cari tidak terdaftar atau telah dihapus.</p>
+          <button onClick={() => router.push("/library")} className="w-full py-3.5 bg-white text-black font-bold rounded-2xl text-xs active:scale-95 transition-all cursor-pointer">Kembali ke Library</button>
+        </div>
+      </div>
+    );
   }
 
   const getEmbedUrl = (url) => {
@@ -296,7 +188,7 @@ export default function LessonPlayerPage() {
         {/* Top Header Bar (ST4) */}
         <div className="flex items-center justify-between w-full">
           <button
-            onClick={() => router.push(`/lesson/${id}`)}
+            onClick={() => router.back()}
             className={backButtonClass}
             aria-label="Back to Subject"
           >
@@ -576,8 +468,18 @@ console.log(faktorial(5)); // Output: 120`}
         <div className="w-full mt-2">
           <button
             onClick={() => {
-              markAsCompleted();
-              router.push(`/lesson/${id}`);
+              if (lesson && lesson.questions && lesson.questions.length > 0) {
+                // If subject has a quiz, open the quiz player
+                setQuizActive(true);
+                setCurrentQIdx(0);
+                setSelectedAnswers({});
+                setQuizResult(null);
+                alert("Selesaikan kuis terlebih dahulu agar streak konsistensi belajar harian kamu bertambah!");
+              } else {
+                // Otherwise complete lesson normally
+                markAsCompleted();
+                router.back();
+              }
             }}
             className={`w-full py-4 rounded-2xl text-center font-bold text-xs uppercase tracking-widest hover:scale-[1.01] active:scale-95 transition-all duration-300 ease-in-out cursor-pointer flex items-center justify-center gap-2 border ${
               isDarkMode 
@@ -592,61 +494,6 @@ console.log(faktorial(5)); // Output: 120`}
 
       </div>
 
-      {/* Floating Bottom Navigation Bar (ST6) */}
-      <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 max-w-md w-[calc(100%-2.5rem)] backdrop-blur-[16px] rounded-full py-2 px-3 shadow-[0_10px_40px_rgba(0,0,0,0.5)] flex items-center justify-between z-50 border transition-all duration-300 ${
-        isDarkMode ? 'bg-[#0C0813]/85 border-white/10' : 'bg-[#F8F9FC]/90 border-black/10'
-      }`}>
-        {/* Dashboard (Home) */}
-        <button 
-          onClick={() => router.push("/")}
-          className="flex flex-col items-center gap-1 py-2.5 px-4 rounded-full text-slate-500 dark:text-white/50 hover:text-slate-900 dark:hover:text-white active:scale-90 transition-all cursor-pointer"
-          title="Dashboard"
-        >
-          <HomeIcon className="w-5 h-5" />
-        </button>
-
-        {/* Learn (Highlight / Active) */}
-        <button 
-          onClick={() => router.push("/library")}
-          className={`flex items-center gap-2 py-2 px-4 rounded-full font-extrabold text-[10px] tracking-widest active:scale-95 transition-all border cursor-pointer ${
-            isDarkMode
-              ? 'bg-white/10 border-white/20 text-white'
-              : 'bg-black/10 border-black/20 text-slate-900'
-          }`}
-          title="Learn"
-        >
-          <BookOpen className="w-4.5 h-4.5" />
-          <span>LEARN</span>
-        </button>
-
-        {/* Stats */}
-        <button 
-          onClick={() => router.push("/stats")}
-          className="flex flex-col items-center gap-1 py-2.5 px-4 rounded-full text-slate-500 dark:text-white/50 hover:text-slate-900 dark:hover:text-white active:scale-90 transition-all cursor-pointer"
-          title="Stats"
-        >
-          <BarChart2 className="w-5 h-5" />
-        </button>
-
-        {/* Profile */}
-        <button 
-          onClick={() => router.push("/profile")}
-          className="flex flex-col items-center gap-1 py-2.5 px-4 rounded-full text-slate-500 dark:text-white/50 hover:text-slate-900 dark:hover:text-white active:scale-90 transition-all cursor-pointer"
-          title="Profile"
-        >
-          <User className="w-5 h-5" />
-        </button>
-
-        {/* Settings */}
-        <button 
-          onClick={() => router.push("/profile/settings")}
-          className="flex flex-col items-center gap-1 py-2.5 px-4 rounded-full text-slate-500 dark:text-white/50 hover:text-slate-900 dark:hover:text-white active:scale-90 transition-all cursor-pointer"
-          title="Settings"
-        >
-          <SettingsIcon className="w-5 h-5" />
-        </button>
-      </div>
-
       {/* PDF Full Screen Overlay Mode (ST3 Expansion) */}
       {isPdfFullScreen && (
         <div className="fixed inset-0 z-[200] bg-[#0B0813] flex flex-col p-6 overflow-hidden">
@@ -658,7 +505,7 @@ console.log(faktorial(5)); // Output: 120`}
           <div className="flex items-center justify-between pb-4 border-b border-white/10 z-10 relative">
             <div className="flex flex-col">
               <span className="text-[9px] text-white/50 font-bold uppercase tracking-widest text-left">FULL SCREEN MODE</span>
-              <h2 className="text-sm font-bold text-white tracking-tight mt-0.5 text-left">Computer Science 101</h2>
+              <h2 className="text-sm font-bold text-white tracking-tight mt-0.5 text-left font-sans">{lesson?.name || "Mata Pelajaran"}</h2>
             </div>
 
             <div className="flex items-center gap-3">
@@ -722,7 +569,7 @@ console.log(faktorial(5)); // Output: 120`}
               >
                 <div className="flex flex-col gap-6 text-slate-800 font-serif leading-relaxed text-xs sm:text-sm text-left">
                   <div className="text-center pb-6 border-b border-slate-300">
-                    <h1 className="text-base sm:text-lg font-black text-slate-900 tracking-tight uppercase">Computer Science 101</h1>
+                    <h1 className="text-base sm:text-lg font-black text-slate-900 tracking-tight uppercase">{lesson?.name || "Mata Pelajaran"}</h1>
                     <p className="text-[10px] sm:text-xs text-slate-500 font-sans mt-1">Introduction to Algorithms & Data Structures</p>
                     <p className="text-[8px] sm:text-[9px] text-slate-400 font-sans mt-0.5">Author: Department of Computer Science</p>
                   </div>
@@ -761,6 +608,217 @@ console.log(faktorial(5)); // Output: 120`}
           </div>
         </div>
       )}
+
+      {/* Interactive Quiz Player Overlay Modal */}
+      <AnimatePresence>
+        {quizActive && (
+          <>
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[120]" />
+            <div className="fixed inset-x-6 top-12 bottom-12 mx-auto max-w-md w-[90%] bg-slate-950 border border-white/10 rounded-[2.5rem] p-6 shadow-[0_0_40px_rgba(255,255,255,0.15)] z-[120] flex flex-col gap-5 overflow-hidden text-white">
+              
+              {/* Header */}
+              <div className="flex justify-between items-center w-full flex-shrink-0">
+                <div className="flex flex-col text-left">
+                  <span className="text-[9px] text-white/50 font-bold uppercase tracking-widest font-sans">EVALUASI AKHIR</span>
+                  <h3 className="text-sm font-bold text-white tracking-tight mt-0.5">{lesson?.name || "Kuis"}</h3>
+                </div>
+                <button
+                  onClick={() => {
+                    if (confirm("Apakah Anda yakin ingin keluar dari kuis? Seluruh jawaban Anda akan hilang.")) {
+                      setQuizActive(false);
+                    }
+                  }}
+                  className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Progress Bar & Index */}
+              {!quizResult && (
+                <div className="flex flex-col gap-2 flex-shrink-0">
+                  <div className="flex justify-between items-center text-[10px] font-bold text-white/60">
+                    <span>Pertanyaan {currentQIdx + 1} dari {lesson.questions.length}</span>
+                    <span>{Math.round(((currentQIdx + 1) / lesson.questions.length) * 100)}%</span>
+                  </div>
+                  <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
+                    <div 
+                      className="h-full bg-white transition-all duration-300"
+                      style={{ width: `${((currentQIdx + 1) / lesson.questions.length) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Active Quiz Question Screen */}
+              {!quizResult ? (
+                <>
+                  {/* Question text */}
+                  <div className="flex-grow overflow-y-auto py-2 flex flex-col justify-center text-center">
+                    <p className="text-sm sm:text-base font-extrabold leading-relaxed text-white/90">
+                      {lesson.questions[currentQIdx]?.question}
+                    </p>
+                  </div>
+
+                  {/* Options List */}
+                  <div className="flex flex-col gap-3 flex-shrink-0">
+                    {lesson.questions[currentQIdx]?.options.map((opt, oIdx) => {
+                      const isSelected = selectedAnswers[currentQIdx] === opt;
+                      return (
+                        <button
+                          key={oIdx}
+                          onClick={() => {
+                            setSelectedAnswers(prev => ({ ...prev, [currentQIdx]: opt }));
+                          }}
+                          className={`w-full py-4 px-5 rounded-2xl text-xs text-left font-bold border transition-all duration-300 active:scale-[0.98] cursor-pointer flex items-center gap-3.5 ${
+                            isSelected 
+                              ? "bg-white text-black border-white shadow-lg transform translate-x-1"
+                              : "bg-white/5 hover:bg-white/10 border-white/10 text-white/80"
+                          }`}
+                        >
+                          <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border-2 ${
+                            isSelected ? "bg-black text-white border-black" : "bg-white/10 border-white/20 text-white"
+                          }`}>
+                            {String.fromCharCode(65 + oIdx)}
+                          </span>
+                          <span className="flex-1 leading-normal">{opt}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Navigation Footer */}
+                  <div className="flex justify-between items-center w-full mt-2 pt-4 border-t border-white/10 flex-shrink-0">
+                    <button
+                      onClick={() => setCurrentQIdx(prev => Math.max(0, prev - 1))}
+                      disabled={currentQIdx === 0}
+                      className="px-5 py-3 bg-white/5 hover:bg-white/10 text-white/80 disabled:opacity-40 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95"
+                    >
+                      Sebelumnya
+                    </button>
+
+                    {currentQIdx < lesson.questions.length - 1 ? (
+                      <button
+                        onClick={() => setCurrentQIdx(prev => prev + 1)}
+                        disabled={!selectedAnswers[currentQIdx]}
+                        className="px-5 py-3 bg-white text-black hover:bg-white/95 disabled:opacity-40 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95"
+                      >
+                        Berikutnya
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          // Calculate score
+                          let correctCount = 0;
+                          lesson.questions.forEach((q, idx) => {
+                            if (selectedAnswers[idx] === q.correct) {
+                              correctCount++;
+                            }
+                          });
+                          const score = Math.round((correctCount / lesson.questions.length) * 100);
+                          const passed = score >= 60;
+                          
+                          setQuizResult({
+                            score,
+                            passed,
+                            correctCount
+                          });
+
+                          if (passed) {
+                            markAsCompleted();
+                          }
+                        }}
+                        disabled={Object.keys(selectedAnswers).length < lesson.questions.length}
+                        className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white disabled:opacity-40 rounded-xl text-xs font-black transition-all cursor-pointer active:scale-95 shadow-md uppercase tracking-wider"
+                      >
+                        Kirim Jawaban
+                      </button>
+                    )}
+                  </div>
+                </>
+              ) : (
+                /* Score & Answers Review Screen */
+                <div className="flex-grow flex flex-col gap-4 overflow-y-auto pr-1">
+                  
+                  {/* Circular Scoreboard */}
+                  <div className="flex flex-col items-center justify-center p-6 rounded-3xl bg-white/[0.02] border border-white/5 shadow-inner mt-2 flex-shrink-0">
+                    <div className={`w-24 h-24 rounded-full flex flex-col items-center justify-center border-4 ${
+                      quizResult.passed ? "border-emerald-500/40 bg-emerald-500/5" : "border-red-500/40 bg-red-500/5"
+                    }`}>
+                      <span className="text-3xl font-black">{quizResult.score}%</span>
+                      <span className="text-[7px] font-black uppercase tracking-wider text-white/50">{quizResult.passed ? "LULUS" : "GAGAL"}</span>
+                    </div>
+
+                    <h4 className="text-xs font-bold text-white mt-4 uppercase tracking-wider">
+                      {quizResult.passed ? "Selamat, Anda Lulus!" : "Ayo Coba Lagi!"}
+                    </h4>
+                    <p className="text-[10px] text-white/60 mt-1 leading-normal text-center max-w-[200px]">
+                      Anda menjawab benar <strong>{quizResult.correctCount}</strong> dari <strong>{lesson.questions.length}</strong> pertanyaan.
+                    </p>
+                  </div>
+
+                  {/* Answers review list */}
+                  <div className="flex flex-col gap-3.5 text-left mt-2">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-white/40 block">Tinjauan Hasil Jawaban</span>
+                    
+                    {lesson.questions.map((q, idx) => {
+                      const ans = selectedAnswers[idx];
+                      const isCorrect = ans === q.correct;
+                      return (
+                        <div key={idx} className="p-4.5 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col gap-2.5">
+                          <div className="flex justify-between items-start gap-2 w-full">
+                            <span className="text-[10px] font-black text-white/50">Pertanyaan {idx + 1}</span>
+                            <span className={`text-[8px] font-extrabold uppercase px-2 py-0.5 rounded border ${
+                              isCorrect 
+                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
+                                : "bg-red-500/10 border-red-500/20 text-red-400"
+                            }`}>
+                              {isCorrect ? "Benar" : "Salah"}
+                            </span>
+                          </div>
+
+                          <p className="text-xs font-bold text-white/90 leading-relaxed">{q.question}</p>
+                          
+                          <div className="flex flex-col gap-1.5 mt-1 text-[10px]">
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-[8px] font-bold uppercase tracking-wider opacity-45 pl-0.5">Jawaban Anda</span>
+                              <span className={`py-1.5 px-3 rounded-lg border font-medium ${
+                                isCorrect 
+                                  ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-400"
+                                  : "bg-red-500/5 border-red-500/10 text-red-400"
+                              }`}>{ans}</span>
+                            </div>
+                            {!isCorrect && (
+                              <div className="flex flex-col gap-0.5 mt-1">
+                                <span className="text-[8px] font-bold uppercase tracking-wider opacity-45 pl-0.5">Kunci Jawaban</span>
+                                <span className="py-1.5 px-3 rounded-lg border bg-emerald-500/5 border-emerald-500/10 text-emerald-400 font-medium">{q.correct}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Close button inside review screen */}
+                  <button
+                    onClick={() => {
+                      setQuizActive(false);
+                      if (quizResult.passed) {
+                        router.back();
+                      }
+                    }}
+                    className="w-full mt-4 bg-white text-black hover:bg-white/90 py-3.5 rounded-2xl text-xs font-black shadow-lg uppercase tracking-widest cursor-pointer transition-all active:scale-95 text-center flex-shrink-0"
+                  >
+                    Tutup Kuis
+                  </button>
+                </div>
+              )}
+
+            </div>
+          </>
+        )}
+      </AnimatePresence>
     </main>
   );
 }

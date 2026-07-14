@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="128" fill="#000000"/>
+  <!-- Modern Stylized "S" -->
+  <path d="M160 160 C 240 110, 352 130, 352 208 C 352 280, 160 232, 160 304 C 160 382, 272 402, 352 352" fill="none" stroke="#ffffff" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

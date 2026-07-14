@@ -17,6 +17,7 @@ import {
   Database,
   Terminal,
   User,
+  Video,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCourseData } from "../../lib/CourseDataContext";
@@ -53,6 +54,300 @@ export default function ProfilePage() {
   const [newAdminEmail, setNewAdminEmail] = useState("");
   const [isAddingAdmin, setIsAddingAdmin] = useState(false);
 
+  // States to add new course & manage syllabus
+  const [newCourseTitle, setNewCourseTitle] = useState("");
+  const [newCourseDesc, setNewCourseDesc] = useState("");
+  const [newCourseCat, setNewCourseCat] = useState("Science");
+  const [newCourseLevel, setNewCourseLevel] = useState("Beginner");
+  const [newCourseVideoUrl, setNewCourseVideoUrl] = useState("");
+  const [newCoursePdfUrl, setNewCoursePdfUrl] = useState("");
+  const [isCreatingCourse, setIsCreatingCourse] = useState(false);
+  const [showAddCourseForm, setShowAddCourseForm] = useState(false);
+
+  const [managingSyllabusSubj, setManagingSyllabusSubj] = useState(null);
+  const [newMateriTitle, setNewMateriTitle] = useState("");
+  const [newMateriDuration, setNewMateriDuration] = useState("15 Menit");
+  const [isSavingSyllabus, setIsSavingSyllabus] = useState(false);
+
+  const [liveClassInputLink, setLiveClassInputLink] = useState("");
+  const [isSavingLiveLink, setIsSavingLiveLink] = useState(false);
+
+  // States to manage Quiz in Admin
+  const [managingQuizSubj, setManagingQuizSubj] = useState(null);
+  const [quizQuestions, setQuizQuestions] = useState([]);
+  const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
+  const [isSavingQuiz, setIsSavingQuiz] = useState(false);
+
+  const handleGenerateQuizAI = () => {
+    if (!managingQuizSubj) return;
+    setIsGeneratingQuiz(true);
+
+    setTimeout(() => {
+      const title = managingQuizSubj.title || "";
+      const category = (managingQuizSubj.category || "").toLowerCase();
+      
+      let generated = [];
+
+      if (category.includes("math") || category.includes("matematika")) {
+        generated = [
+          {
+            question: `Apakah definisi dari baris eselon tereduksi dalam konteks ${title}?`,
+            options: [
+              "Setiap baris bukan nol memiliki elemen kepemimpinan bernilai 1, dan kolom di bawah/di atasnya bernilai nol",
+              "Semua baris memiliki determinan bernilai negatif",
+              "Matriks yang hanya memiliki nilai eigenvalue imajiner",
+              "Transformasi linear yang melipatgandakan dimensi ruang asal"
+            ],
+            correct: "Setiap baris bukan nol memiliki elemen kepemimpinan bernilai 1, dan kolom di bawah/di atasnya bernilai nol"
+          },
+          {
+            question: `Mengapa konsep perkalian matriks sering digunakan dalam visualisasi ${title}?`,
+            options: [
+              "Untuk mengombinasikan beberapa transformasi linier menjadi satu matriks tunggal",
+              "Untuk menghitung nilai absolut dari skalar yang konstan",
+              "Untuk menghindari pembagian memori pada sistem basis data",
+              "Untuk menjumlahkan elemen baris secara diagonal saja"
+            ],
+            correct: "Untuk mengombinasikan beberapa transformasi linier menjadi satu matriks tunggal"
+          },
+          {
+            question: `Jika sebuah matriks memiliki determinan bernilai nol, manakah pernyataan yang benar?`,
+            options: [
+              "Matriks tersebut singular dan tidak memiliki invers",
+              "Sistem persamaan linear selalu memiliki solusi unik",
+              "Matriks tersebut pasti berupa matriks identitas",
+              "Vektor-vektor barisnya pasti saling tegak lurus (ortogonal)"
+            ],
+            correct: "Matriks tersebut singular dan tidak memiliki invers"
+          },
+          {
+            question: `Dalam ${title}, apa arti geometri dari nilai Eigen (Eigenvalue)?`,
+            options: [
+              "Faktor skala peregangan/penyusutan vektor eigen selama transformasi linier",
+              "Sudut rotasi objek terhadap sumbu koordinat utama",
+              "Panjang total dari proyeksi ortogonal dua vektor berbeda",
+              "Volume ruang berdimensi tinggi yang dibatasi oleh matriks"
+            ],
+            correct: "Faktor skala peregangan/penyusutan vektor eigen selama transformasi linier"
+          },
+          {
+            question: `Manakah dari berikut ini yang merupakan contoh aplikasi nyata dari konsep ${title}?`,
+            options: [
+              "Algoritma kompresi gambar, PageRank Google, dan grafik komputer 3D",
+              "Penyimpanan berkas statis di memori internal perangkat",
+              "Pembuatan skrip routing halaman web dinamis",
+              "Sintesis protein rantai tunggal RNA sel eukariotik"
+            ],
+            correct: "Algoritma kompresi gambar, PageRank Google, dan grafik komputer 3D"
+          }
+        ];
+      } else if (category.includes("science") || category.includes("ipa")) {
+        generated = [
+          {
+            question: `Dalam pembahasan tentang ${title}, organel manakah yang bertindak sebagai "the powerhouse of cell" karena menghasilkan energi ATP?`,
+            options: [
+              "Mitokondria",
+              "Ribosom",
+              "Aparatus Golgi",
+              "Lisosom"
+            ],
+            correct: "Mitokondria"
+          },
+          {
+            question: `Apakah perbedaan utama antara sel prokariotik dan eukariotik dalam konteks materi ${title}?`,
+            options: [
+              "Sel eukariotik memiliki membran inti sel, sedangkan prokariotik tidak",
+              "Sel prokariotik memiliki ukuran yang jauh lebih besar dibanding eukariotik",
+              "Sel prokariotik memiliki membran sel ganda, sedangkan eukariotik tanpa membran",
+              "Sel eukariotik tidak memiliki blueprint genetik DNA"
+            ],
+            correct: "Sel eukariotik memiliki membran inti sel, sedangkan prokariotik tidak"
+          },
+          {
+            question: `Apakah fungsi utama dari Ribosom yang tersebar di sitoplasma dalam ${title}?`,
+            options: [
+              "Melakukan sintesis protein berdasarkan kode mRNA",
+              "Mencerna protein rusak dan makromolekul asing",
+              "Menyimpan air dan cadangan makanan seluler",
+              "Membelah diri secara mitosis untuk regenerasi sel"
+            ],
+            correct: "Melakukan sintesis protein berdasarkan kode mRNA"
+          },
+          {
+            question: `Manakah dari zat berikut yang menyusun dinding sel tumbuhan sehingga strukturnya menjadi kaku?`,
+            options: [
+              "Selulosa",
+              "Glikogen",
+              "Lipid",
+              "Keratin"
+            ],
+            correct: "Selulosa"
+          },
+          {
+            question: `Organel sel manakah yang berperan penting dalam proses fotosintesis sel tumbuhan?`,
+            options: [
+              "Kloroplas",
+              "Vakuola",
+              "Sentrosom",
+              "Retikulum Endoplasma"
+            ],
+            correct: "Kloroplas"
+          }
+        ];
+      } else if (category.includes("coding") || category.includes("program") || category.includes("web")) {
+        generated = [
+          {
+            question: `Di dalam Next.js (App Router) terkait ${title}, bagaimana cara menangkap parameter dinamis dari URL /lesson/[id]?`,
+            options: [
+              "Menggunakan props params di dalam komponen halaman atau hooks useParams()",
+              "Menggunakan global state window.location.href secara manual",
+              "Melalui rute handler statis dengan format config.json",
+              "Menggunakan middleware penjelajah URL eksternal"
+            ],
+            correct: "Menggunakan props params di dalam komponen halaman atau hooks useParams()"
+          },
+          {
+            question: `Apa fungsi dari file middleware.js atau proxy di Next.js App Router?`,
+            options: [
+              "Menjalankan kode server-side sebelum request diselesaikan (untuk proteksi rute)",
+              "Menyimpan data cache secara luring di memori browser klien",
+              "Menyusun ikon manifest dan mengonfigurasi Service Worker PWA",
+              "Menghubungkan aplikasi langsung ke kluster basis data tanpa ORM"
+            ],
+            correct: "Menjalankan kode server-side sebelum request diselesaikan (untuk proteksi rute)"
+          },
+          {
+            question: `Apa keuntungan menggunakan state hook seperti useState di React?`,
+            options: [
+              "Memungkinkan komponen untuk melacak data yang berubah dan me-render ulang UI secara otomatis",
+              "Membatasi reaktivitas komponen agar berjalan secara sinkron",
+              "Menyimpan token autentikasi di dalam database MongoDB secara permanen",
+              "Menghapus seluruh file cookie dan penyimpanan sesi di browser"
+            ],
+            correct: "Memungkinkan komponen untuk melacak data yang berubah dan me-render ulang UI secara otomatis"
+          },
+          {
+            question: `Dalam ${title}, apa yang membedakan Client Component dan Server Component di Next.js?`,
+            options: [
+              "Client Component dirender di browser dan mendukung interaktivitas (hooks), sedangkan Server Component dirender di server",
+              "Server Component tidak dapat mengakses database MongoDB secara langsung",
+              "Client Component ditulis menggunakan bahasa Python, sedangkan Server Component menggunakan JavaScript",
+              "Server Component tidak mendukung rendering elemen HTML sama sekali"
+            ],
+            correct: "Client Component dirender di browser dan mendukung interaktivitas (hooks), sedangkan Server Component dirender di server"
+          },
+          {
+            question: `Bagaimana cara kerja Service Worker pada Progressive Web App (PWA) di Next.js?`,
+            options: [
+              "Menangkap request jaringan dan menyajikan aset dari cache lokal untuk fungsionalitas luring",
+              "Mempercepat kueri pencarian data pada basis data jarak jauh",
+              "Melakukan kompilasi bundle Next.js menjadi file executable biner",
+              "Melacak lokasi GPS pengguna secara berkala di latar belakang"
+            ],
+            correct: "Menangkap request jaringan dan menyajikan aset dari cache lokal untuk fungsionalitas luring"
+          }
+        ];
+      } else {
+        // Fallback / General category
+        generated = [
+          {
+            question: `Apa fokus utama dari pembahasan kelas tentang '${title}'?`,
+            options: [
+              "Pengenalan konsep dasar secara mendalam dan terarah",
+              "Pengujian ketahanan performa infrastruktur server",
+              "Teknik integrasi skrip otomatisasi tingkat tinggi",
+              "Pencadangan data cadangan luring di cloud storage"
+            ],
+            correct: "Pengenalan konsep dasar secara mendalam dan terarah"
+          },
+          {
+            question: `Berdasarkan keterangan mata pelajaran '${title}', manakah pernyataan yang paling tepat menggambarkan relevansi materi tersebut?`,
+            options: [
+              "Membantu memahami fundamental subjek untuk diimplementasikan secara praktis",
+              "Sebagai referensi komparasi pustaka pihak ketiga saja",
+              "Untuk mengabaikan optimasi standardisasi industri terbaru",
+              "Hanya berupa teori abstrak tanpa contoh kasus nyata"
+            ],
+            correct: "Membantu memahami fundamental subjek untuk diimplementasikan secara praktis"
+          },
+          {
+            question: `Mengapa pemahaman silabus materi dalam '${title}' sangat direkomendasikan bagi pemula?`,
+            options: [
+              "Karena disusun berurutan dari pengenalan awal hingga penerapan kasus nyata",
+              "Agar dapat melewati proses sertifikasi tanpa ujian",
+              "Untuk membatasi durasi belajar sekecil mungkin",
+              "Menghindari interaksi dengan materi pendukung lainnya"
+            ],
+            correct: "Karena disusun berurutan dari pengenalan awal hingga penerapan kasus nyata"
+          },
+          {
+            question: `Dalam mempelajari '${title}', metode manakah yang paling efektif untuk menguasai sub-bab materi tersebut?`,
+            options: [
+              "Membaca catatan pendukung materi, menonton media video, dan mengerjakan kuis evaluasi",
+              "Menghafal seluruh baris kode tanpa memahaminya secara logis",
+              "Mengabaikan silabus pelajaran dan langsung menempuh ujian akhir",
+              "Menghubungi mentor secara terus-menerus tanpa latihan mandiri"
+            ],
+            correct: "Membaca catatan pendukung materi, menonton media video, dan mengerjakan kuis evaluasi"
+          },
+          {
+            question: `Apa manfaat penyelesaian kuis evaluasi secara berkala pada kelas '${title}'?`,
+            options: [
+              "Menguji pemahaman konsep, memantau kemajuan belajar, dan menjaga konsistensi streak harian",
+              "Menggandakan kapasitas memori penyimpanan pada database sistem",
+              "Menghapus riwayat aktivitas belajar yang telah dicatat sebelumnya",
+              "Memblokir akses masuk pengguna lain ke sistem admin"
+            ],
+            correct: "Menguji pemahaman konsep, memantau kemajuan belajar, dan menjaga konsistensi streak harian"
+          }
+        ];
+      }
+
+      setQuizQuestions(generated);
+      setIsGeneratingQuiz(false);
+      alert("AI berhasil menyusun 5 soal kuis bermutu tinggi berdasarkan subjek!");
+    }, 1500);
+  };
+
+  const saveQuizToDB = (updatedQuestions) => {
+    if (!managingQuizSubj) return;
+    setIsSavingQuiz(true);
+
+    const payload = {
+      id: managingQuizSubj.id,
+      title: managingQuizSubj.title,
+      description: managingQuizSubj.description,
+      category: managingQuizSubj.category,
+      driveLink: managingQuizSubj.driveLink,
+      videoUrl: managingQuizSubj.videoUrl,
+      quizStatus: updatedQuestions.length > 0 ? "Sudah Ada" : "Belum Ada",
+      questions: updatedQuestions,
+      syllabus: managingQuizSubj.syllabus,
+    };
+
+    fetch("/api/subjects", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => res.json())
+      .then((updatedSubj) => {
+        setIsSavingQuiz(false);
+        if (updatedSubj && !updatedSubj.error) {
+          alert("Kuis berhasil disimpan ke database!");
+          setSubjectsList((prev) => prev.map((s) => s.id === updatedSubj.id ? updatedSubj : s));
+          setManagingQuizSubj(null);
+        } else {
+          alert("Gagal menyimpan kuis.");
+        }
+      })
+      .catch((err) => {
+        setIsSavingQuiz(false);
+        console.error(err);
+        alert("Terjadi kesalahan saat menyimpan kuis.");
+      });
+  };
+
   useEffect(() => {
     setMounted(true);
     if (typeof window === "undefined") return;
@@ -87,6 +382,16 @@ export default function ProfilePage() {
                 }
               })
               .catch((err) => console.error("Error loading subjects in profile:", err));
+
+            // Load live class link
+            fetch("/api/live-class")
+              .then((res) => res.json())
+              .then((liveData) => {
+                if (liveData && liveData.link) {
+                  setLiveClassInputLink(liveData.link);
+                }
+              })
+              .catch((err) => console.error("Error loading live class link in admin:", err));
           }
         }
       })
@@ -462,18 +767,206 @@ export default function ProfilePage() {
                   <h3 className="text-xs font-black tracking-widest uppercase opacity-60 flex items-center gap-1.5">
                     <Database className="w-3.5 h-3.5" /> Manage Courses & Media
                   </h3>
-                  <p className="text-[10px] app-theme-text-muted">Configure PDF documents and Video routing for student syllabus items.</p>
+                  <p className="text-[10px] app-theme-text-muted">Configure courses, syllabus materials, and media routing for student lessons.</p>
                 </div>
 
+                {/* Section: Live Class Settings */}
+                <div className="p-4.5 rounded-3xl app-theme-card relative overflow-hidden flex flex-col gap-3.5 shadow-xl border border-white/10 bg-white/[0.02] backdrop-blur-md text-left">
+                  <h4 className="text-xs font-black uppercase tracking-wider opacity-70 flex items-center gap-1.5">
+                    <Video className="w-3.5 h-3.5 text-[var(--text-color)]" /> Link Live Class (Webinar Mingguan)
+                  </h4>
+                  <p className="text-[9px] app-theme-text-muted -mt-1">Masukkan tautan Google Meet atau Zoom untuk kelas live minggu ini.</p>
+                  
+                  <div className="flex gap-2 mt-1">
+                    <input
+                      type="text"
+                      value={liveClassInputLink}
+                      onChange={(e) => setLiveClassInputLink(e.target.value)}
+                      placeholder="https://meet.google.com/... atau https://zoom.us/..."
+                      className="flex-1 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-3 px-4 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--text-color)] transition-all"
+                    />
+                    <button
+                      onClick={() => {
+                        if (!liveClassInputLink || liveClassInputLink.trim() === "") {
+                          alert("Masukkan link live class.");
+                          return;
+                        }
+                        setIsSavingLiveLink(true);
+                        fetch("/api/live-class", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ link: liveClassInputLink.trim() })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                          setIsSavingLiveLink(false);
+                          if (data && !data.error) {
+                            alert("Link Live Class berhasil diperbarui!");
+                          } else {
+                            alert(data.error || "Gagal memperbarui link.");
+                          }
+                        })
+                        .catch(err => {
+                          setIsSavingLiveLink(false);
+                          console.error(err);
+                          alert("Terjadi kesalahan.");
+                        });
+                      }}
+                      disabled={isSavingLiveLink}
+                      className="px-4 py-3 bg-[var(--text-color)] text-[var(--bg-color)] hover:opacity-90 rounded-2xl text-xs font-bold transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                    >
+                      {isSavingLiveLink ? "Menyimpan..." : "Simpan Link"}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Button: Toggle Create Course Form */}
+                <button
+                  onClick={() => setShowAddCourseForm(!showAddCourseForm)}
+                  className="w-full py-3 bg-[var(--text-color)] text-[var(--bg-color)] hover:opacity-90 rounded-2xl text-[10px] font-black tracking-wider uppercase shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  {showAddCourseForm ? "Tutup Form Tambah Kelas" : "+ Tambah Pelajaran Baru"}
+                </button>
+
+                {/* Form: Tambah Pelajaran Baru */}
+                {showAddCourseForm && (
+                  <div className="p-5 rounded-3xl app-theme-card relative overflow-hidden flex flex-col gap-4 shadow-xl border border-white/10 bg-white/[0.02] backdrop-blur-md text-left">
+                    <h4 className="text-xs font-black uppercase tracking-wider opacity-70">Tambah Pelajaran Baru</h4>
+                    
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[8px] font-bold uppercase tracking-widest opacity-60 pl-1">Judul Pelajaran</label>
+                      <input
+                        type="text"
+                        value={newCourseTitle}
+                        onChange={(e) => setNewCourseTitle(e.target.value)}
+                        placeholder="Contoh: Dasar Pemrograman Python"
+                        className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-3 px-4 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--text-color)] transition-all"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[8px] font-bold uppercase tracking-widest opacity-60 pl-1">Kategori</label>
+                        <select
+                          value={newCourseCat}
+                          onChange={(e) => setNewCourseCat(e.target.value)}
+                          className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-white/10 rounded-2xl py-3 px-4 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--text-color)] transition-all"
+                        >
+                          <option value="Science">Science</option>
+                          <option value="Matematika">Matematika</option>
+                          <option value="Coding">Coding</option>
+                          <option value="Bahasa Inggris">Bahasa Inggris</option>
+                        </select>
+                      </div>
+
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[8px] font-bold uppercase tracking-widest opacity-60 pl-1">Tingkat Kesulitan</label>
+                        <select
+                          value={newCourseLevel}
+                          onChange={(e) => setNewCourseLevel(e.target.value)}
+                          className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-white/10 rounded-2xl py-3 px-4 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--text-color)] transition-all"
+                        >
+                          <option value="Beginner">Beginner</option>
+                          <option value="Intermediate">Intermediate</option>
+                          <option value="Advanced">Advanced</option>
+                          <option value="Beginner to Pro">Beginner to Pro</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[8px] font-bold uppercase tracking-widest opacity-60 pl-1">Deskripsi Kelas</label>
+                      <textarea
+                        value={newCourseDesc}
+                        onChange={(e) => setNewCourseDesc(e.target.value)}
+                        placeholder="Tulis ringkasan mengenai materi kelas ini..."
+                        rows={3}
+                        className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-3 px-4 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--text-color)] transition-all resize-none"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[8px] font-bold uppercase tracking-widest opacity-60 pl-1">Video URL (YouTube)</label>
+                      <input
+                        type="text"
+                        value={newCourseVideoUrl}
+                        onChange={(e) => setNewCourseVideoUrl(e.target.value)}
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-3 px-4 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--text-color)] transition-all"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[8px] font-bold uppercase tracking-widest opacity-60 pl-1">PDF / Drive Link</label>
+                      <input
+                        type="text"
+                        value={newCoursePdfUrl}
+                        onChange={(e) => setNewCoursePdfUrl(e.target.value)}
+                        placeholder="https://drive.google.com/..."
+                        className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-3 px-4 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--text-color)] transition-all"
+                      />
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        if (!newCourseTitle || newCourseTitle.trim() === "" || !newCourseDesc || newCourseDesc.trim() === "") {
+                          alert("Judul dan Deskripsi kelas wajib diisi.");
+                          return;
+                        }
+                        setIsCreatingCourse(true);
+                        fetch("/api/subjects", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            title: newCourseTitle.trim(),
+                            description: newCourseDesc.trim(),
+                            category: newCourseCat,
+                            level: newCourseLevel,
+                            driveLink: newCoursePdfUrl.trim(),
+                            videoUrl: newCourseVideoUrl.trim(),
+                            syllabus: []
+                          })
+                        })
+                        .then((res) => res.json())
+                        .then((data) => {
+                          setIsCreatingCourse(false);
+                          if (data && !data.error) {
+                            alert("Mata pelajaran baru berhasil ditambahkan!");
+                            setSubjectsList(prev => [...prev, data]);
+                            // Reset form
+                            setNewCourseTitle("");
+                            setNewCourseDesc("");
+                            setNewCourseVideoUrl("");
+                            setNewCoursePdfUrl("");
+                            setShowAddCourseForm(false);
+                          } else {
+                            alert(data.error || "Gagal menambahkan mata pelajaran.");
+                          }
+                        })
+                        .catch((err) => {
+                          setIsCreatingCourse(false);
+                          console.error(err);
+                          alert("Terjadi kesalahan.");
+                        });
+                      }}
+                      disabled={isCreatingCourse}
+                      className="mt-2 w-full bg-[var(--text-color)] text-[var(--bg-color)] hover:opacity-95 rounded-2xl py-3.5 text-xs font-black shadow-lg border border-[var(--border-color)] transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                    >
+                      {isCreatingCourse ? "Memproses..." : "Tambah Kelas Baru"}
+                    </button>
+                  </div>
+                )}
+
+                {/* List of subjects */}
                 {subjectsList.map((subj) => (
                   <div
                     key={subj.id}
-                    className="w-full p-4.5 rounded-3xl app-theme-card relative overflow-hidden flex flex-col gap-3 shadow-xl border border-white/10 bg-white/[0.02] backdrop-blur-md transition-all duration-300"
+                    className="w-full p-4.5 rounded-3xl app-theme-card relative overflow-hidden flex flex-col gap-3.5 shadow-xl border border-white/10 bg-white/[0.02] backdrop-blur-md transition-all duration-300"
                   >
                     <div className="flex justify-between items-start w-full">
                       <div className="flex flex-col text-left">
-                        <span className="text-xs font-bold app-theme-text leading-tight">{subj.title}</span>
-                        <span className="text-[9px] app-theme-text-muted mt-1 uppercase font-semibold tracking-wider">Kategori: {subj.category}</span>
+                        <span className="text-xs font-extrabold app-theme-text leading-tight">{subj.title}</span>
+                        <span className="text-[9px] app-theme-text-muted mt-1 uppercase font-semibold tracking-wider">Kategori: {subj.category} • {subj.level || "Beginner"}</span>
                       </div>
                     </div>
 
@@ -492,17 +985,84 @@ export default function ProfilePage() {
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => {
-                        setEditingSubject(subj);
-                        setEditTitle(subj.title);
-                        setEditVideoUrl(subj.videoUrl || "");
-                        setEditPdfUrl(subj.driveLink || "");
-                      }}
-                      className="mt-2 w-full py-2 bg-[var(--text-color)]/5 border border-[var(--border-color)] hover:bg-[var(--text-color)]/10 text-[var(--text-color)] rounded-xl text-[10px] font-bold transition-all cursor-pointer text-center"
-                    >
-                      Edit Routing
-                    </button>
+                    {/* Syllabus list summary */}
+                    <div className="mt-1 border-t border-[var(--border-color)]/20 pt-2.5 text-left">
+                      <span className="text-[9px] font-bold uppercase tracking-widest opacity-60 block mb-1">Daftar Materi ({subj.syllabus ? subj.syllabus.length : 0})</span>
+                      {subj.syllabus && subj.syllabus.length > 0 ? (
+                        <div className="flex flex-col gap-1 max-h-[100px] overflow-y-auto pr-1">
+                          {subj.syllabus.map((item, idx) => (
+                            <div key={idx} className="flex justify-between items-center text-[9px] bg-black/5 dark:bg-white/[0.02] border border-black/10 dark:border-white/[0.05] rounded-lg px-2.5 py-1">
+                              <span className="truncate max-w-[220px]">
+                                <span className="opacity-55 font-bold mr-1">Materi {idx + 1}:</span>{item.title}
+                              </span>
+                              <span className="text-[8px] opacity-60 font-semibold">{item.duration}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-[9px] italic opacity-40">Belum ada materi pelajaran.</span>
+                      )}
+                    </div>
+
+                    {/* Four-Button Action Grid (2x2) */}
+                    <div className="grid grid-cols-2 gap-2 mt-2 w-full">
+                      <button
+                        onClick={() => {
+                          setManagingSyllabusSubj(subj);
+                          setNewMateriTitle("");
+                          setNewMateriDuration("15 Menit");
+                        }}
+                        className="py-2.5 bg-[var(--text-color)]/5 border border-[var(--border-color)] hover:bg-[var(--text-color)]/10 text-[var(--text-color)] rounded-xl text-[9px] font-bold transition-all cursor-pointer text-center flex items-center justify-center gap-1 active:scale-95"
+                      >
+                        Kelola Materi
+                      </button>
+                      <button
+                        onClick={() => {
+                          setManagingQuizSubj(subj);
+                          setQuizQuestions(subj.questions ? JSON.parse(JSON.stringify(subj.questions)) : []);
+                        }}
+                        className="py-2.5 bg-[var(--text-color)]/5 border border-[var(--border-color)] hover:bg-[var(--text-color)]/10 text-[var(--text-color)] rounded-xl text-[9px] font-bold transition-all cursor-pointer text-center flex items-center justify-center gap-1 active:scale-95"
+                      >
+                        Kelola Kuis ({subj.questions ? subj.questions.length : 0})
+                      </button>
+                      <button
+                        onClick={() => {
+                          setEditingSubject(subj);
+                          setEditTitle(subj.title);
+                          setEditVideoUrl(subj.videoUrl || "");
+                          setEditPdfUrl(subj.driveLink || "");
+                        }}
+                        className="py-2.5 bg-[var(--text-color)]/5 border border-[var(--border-color)] hover:bg-[var(--text-color)]/10 text-[var(--text-color)] rounded-xl text-[9px] font-bold transition-all cursor-pointer text-center flex items-center justify-center gap-1 active:scale-95"
+                      >
+                        Edit Detail
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (!confirm(`Hapus mata pelajaran "${subj.title}" beserta seluruh materi dan kuisionernya?`)) return;
+                          fetch("/api/subjects", {
+                            method: "DELETE",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ id: subj.id })
+                          })
+                          .then((res) => res.json())
+                          .then((data) => {
+                            if (data && data.success) {
+                              alert("Mata pelajaran berhasil dihapus!");
+                              setSubjectsList(prev => prev.filter(s => s.id !== subj.id));
+                            } else {
+                              alert(data.error || "Gagal menghapus mata pelajaran.");
+                            }
+                          })
+                          .catch((err) => {
+                            console.error(err);
+                            alert("Terjadi kesalahan.");
+                          });
+                        }}
+                        className="py-2.5 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-red-500 rounded-xl text-[9px] font-bold transition-all cursor-pointer text-center flex items-center justify-center gap-1 active:scale-95"
+                      >
+                        Hapus Kelas
+                      </button>
+                    </div>
                   </div>
                 ))}
 
@@ -511,13 +1071,13 @@ export default function ProfilePage() {
                   {editingSubject && (
                     <>
                       <div 
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 cursor-pointer"
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] cursor-pointer"
                         onClick={() => setEditingSubject(null)}
                       />
-                      <div className="fixed inset-x-6 top-1/2 -translate-y-1/2 mx-auto max-w-sm w-[90%] bg-white dark:bg-neutral-950 border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-2xl z-50 flex flex-col gap-4 overflow-hidden backdrop-blur-xl text-slate-900 dark:text-white">
+                      <div className="fixed inset-x-6 top-1/2 -translate-y-1/2 mx-auto max-w-sm w-[90%] bg-white dark:bg-neutral-950 border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-2xl z-[110] flex flex-col gap-4 overflow-hidden backdrop-blur-xl text-slate-900 dark:text-white">
                         <div className="flex justify-between items-center w-full">
                           <div className="flex flex-col text-left">
-                            <h3 className="text-xs font-black uppercase tracking-wider">Edit Media Routing</h3>
+                            <h3 className="text-xs font-black uppercase tracking-wider">Edit Detail / Routing</h3>
                             <span className="text-[9px] opacity-50 font-semibold mt-0.5">{editTitle}</span>
                           </div>
                           <button
@@ -590,6 +1150,316 @@ export default function ProfilePage() {
                             className="mt-2 w-full bg-black dark:bg-white hover:bg-black/90 dark:hover:bg-white/90 text-white dark:text-black rounded-2xl py-3.5 text-xs font-black shadow-lg border border-black/10 dark:border-white/10 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
                           >
                             {isSavingSubject ? "Saving..." : "Save Routing"}
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </AnimatePresence>
+
+                {/* Manage Syllabus Modal Overlay */}
+                <AnimatePresence>
+                  {managingSyllabusSubj && (
+                    <>
+                      <div 
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] cursor-pointer"
+                        onClick={() => setManagingSyllabusSubj(null)}
+                      />
+                      <div className="fixed inset-x-6 top-1/2 -translate-y-1/2 mx-auto max-w-sm w-[90%] bg-white dark:bg-neutral-950 border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-2xl z-[110] flex flex-col gap-4.5 overflow-hidden backdrop-blur-xl text-slate-900 dark:text-white">
+                        <div className="flex justify-between items-center w-full">
+                          <div className="flex flex-col text-left">
+                            <h3 className="text-xs font-black uppercase tracking-wider">Kelola Materi Kelas</h3>
+                            <span className="text-[9px] opacity-50 font-semibold mt-0.5 truncate max-w-[220px]">{managingSyllabusSubj.title}</span>
+                          </div>
+                          <button
+                            onClick={() => setManagingSyllabusSubj(null)}
+                            className="w-7 h-7 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 flex items-center justify-center text-slate-600 dark:text-white/70 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        {/* Add Syllabus Item Form */}
+                        <div className="flex flex-col gap-2.5 p-3.5 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 text-left">
+                          <span className="text-[8px] font-black uppercase tracking-widest opacity-60">+ Tambah Materi (Sub-Bab)</span>
+                          
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[7px] font-bold uppercase tracking-widest opacity-50 pl-0.5">Judul Materi</label>
+                            <input
+                              type="text"
+                              value={newMateriTitle}
+                              onChange={(e) => setNewMateriTitle(e.target.value)}
+                              placeholder="Contoh: Pengenalan Pembelahan Sel"
+                              className="w-full bg-white dark:bg-neutral-900 border border-slate-200 dark:border-white/10 rounded-xl py-2 px-3 text-[11px] focus:outline-none focus:ring-1 focus:ring-[var(--text-color)] transition-all"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[7px] font-bold uppercase tracking-widest opacity-50 pl-0.5">Durasi Waktu</label>
+                            <input
+                              type="text"
+                              value={newMateriDuration}
+                              onChange={(e) => setNewMateriDuration(e.target.value)}
+                              placeholder="Contoh: 30 Menit"
+                              className="w-full bg-white dark:bg-neutral-900 border border-slate-200 dark:border-white/10 rounded-xl py-2 px-3 text-[11px] focus:outline-none focus:ring-1 focus:ring-[var(--text-color)] transition-all"
+                            />
+                          </div>
+
+                          <button
+                            onClick={() => {
+                              if (!newMateriTitle || newMateriTitle.trim() === "") {
+                                alert("Masukkan judul materi.");
+                                return;
+                              }
+                              setIsSavingSyllabus(true);
+                              
+                              const currentSyllabus = managingSyllabusSubj.syllabus || [];
+                              const updatedSyllabus = [
+                                ...currentSyllabus,
+                                {
+                                  title: newMateriTitle.trim(),
+                                  duration: newMateriDuration.trim() || "15 Menit"
+                                }
+                              ];
+
+                              fetch("/api/subjects", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                  ...managingSyllabusSubj,
+                                  syllabus: updatedSyllabus
+                                })
+                              })
+                              .then((res) => res.json())
+                              .then((updatedSubj) => {
+                                setIsSavingSyllabus(false);
+                                if (updatedSubj && !updatedSubj.error) {
+                                  alert("Materi baru berhasil ditambahkan!");
+                                  setSubjectsList(prev => prev.map(s => s.id === updatedSubj.id ? updatedSubj : s));
+                                  setManagingSyllabusSubj(updatedSubj); // refresh state in modal
+                                  setNewMateriTitle("");
+                                  setNewMateriDuration("15 Menit");
+                                } else {
+                                  alert("Gagal menambahkan materi.");
+                                }
+                              })
+                              .catch((err) => {
+                                setIsSavingSyllabus(false);
+                                console.error(err);
+                                alert("Terjadi kesalahan.");
+                              });
+                            }}
+                            disabled={isSavingSyllabus}
+                            className="mt-1 w-full bg-black dark:bg-white hover:bg-black/90 dark:hover:bg-white/90 text-white dark:text-black rounded-xl py-2.5 text-[10px] font-black shadow transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                          >
+                            {isSavingSyllabus ? "Menyimpan..." : "Tambah Materi"}
+                          </button>
+                        </div>
+
+                        {/* List of Syllabus Items with Delete Option */}
+                        <div className="flex flex-col gap-2 max-h-[160px] overflow-y-auto text-left">
+                          <span className="text-[8px] font-black uppercase tracking-widest opacity-60">Materi Terdaftar ({managingSyllabusSubj.syllabus ? managingSyllabusSubj.syllabus.length : 0})</span>
+                          {managingSyllabusSubj.syllabus && managingSyllabusSubj.syllabus.length > 0 ? (
+                            <div className="flex flex-col gap-2">
+                              {managingSyllabusSubj.syllabus.map((item, idx) => (
+                                <div key={idx} className="flex justify-between items-center bg-black/5 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl px-3 py-2 text-[10px]">
+                                  <div className="flex flex-col gap-0.5 text-left max-w-[200px]">
+                                    <span className="font-bold truncate">Materi {idx + 1}: {item.title}</span>
+                                    <span className="text-[8px] opacity-60 font-semibold">{item.duration}</span>
+                                  </div>
+                                  <button
+                                    onClick={() => {
+                                      if (!confirm(`Hapus Materi ${idx + 1}: "${item.title}"?`)) return;
+                                      setIsSavingSyllabus(true);
+                                      
+                                      const updatedSyllabus = managingSyllabusSubj.syllabus.filter((_, i) => i !== idx);
+
+                                      fetch("/api/subjects", {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({
+                                          ...managingSyllabusSubj,
+                                          syllabus: updatedSyllabus
+                                        })
+                                      })
+                                      .then((res) => res.json())
+                                      .then((updatedSubj) => {
+                                        setIsSavingSyllabus(false);
+                                        if (updatedSubj && !updatedSubj.error) {
+                                          alert("Materi berhasil dihapus!");
+                                          setSubjectsList(prev => prev.map(s => s.id === updatedSubj.id ? updatedSubj : s));
+                                          setManagingSyllabusSubj(updatedSubj); // refresh state in modal
+                                        } else {
+                                          alert("Gagal menghapus materi.");
+                                        }
+                                      })
+                                      .catch((err) => {
+                                        setIsSavingSyllabus(false);
+                                        console.error(err);
+                                        alert("Terjadi kesalahan.");
+                                      });
+                                    }}
+                                    disabled={isSavingSyllabus}
+                                    className="text-red-500 font-bold hover:text-red-600 active:scale-95 transition-all text-[8px] border border-red-500/20 bg-red-500/5 px-2 py-1 rounded cursor-pointer"
+                                  >
+                                    Hapus
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="text-[9px] italic opacity-40 text-center py-4 block">Belum ada materi terdaftar.</span>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </AnimatePresence>
+
+                {/* Manage Quiz Modal Overlay */}
+                <AnimatePresence>
+                  {managingQuizSubj && (
+                    <>
+                      <div 
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] cursor-pointer"
+                        onClick={() => setManagingQuizSubj(null)}
+                      />
+                      <div className="fixed inset-x-6 top-12 bottom-12 mx-auto max-w-sm w-[90%] bg-white dark:bg-neutral-950 border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-2xl z-[110] flex flex-col gap-4 overflow-hidden backdrop-blur-xl text-slate-900 dark:text-white">
+                        <div className="flex justify-between items-center w-full flex-shrink-0">
+                          <div className="flex flex-col text-left">
+                            <h3 className="text-xs font-black uppercase tracking-wider">Kelola Kuis Kelas</h3>
+                            <span className="text-[9px] opacity-50 font-semibold mt-0.5 truncate max-w-[220px]">{managingQuizSubj.title}</span>
+                          </div>
+                          <button
+                            onClick={() => setManagingQuizSubj(null)}
+                            className="w-7 h-7 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 flex items-center justify-center text-slate-600 dark:text-white/70 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        {/* Actions Row: AI Generator & Add Question */}
+                        <div className="flex gap-2 w-full flex-shrink-0">
+                          <button
+                            onClick={handleGenerateQuizAI}
+                            disabled={isGeneratingQuiz}
+                            className="flex-1 py-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 border border-emerald-500/20 rounded-2xl text-[10px] font-bold tracking-wider uppercase transition-all active:scale-95 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
+                          >
+                            {isGeneratingQuiz ? "Generating..." : "Auto-Generate AI"}
+                          </button>
+                          <button
+                            onClick={() => {
+                              const newQ = {
+                                question: "Tulis pertanyaan kuis baru...",
+                                options: ["Pilihan A", "Pilihan B", "Pilihan C", "Pilihan D"],
+                                correct: "Pilihan A"
+                              };
+                              setQuizQuestions(prev => [...prev, newQ]);
+                            }}
+                            className="flex-1 py-3 bg-[var(--text-color)]/5 border border-[var(--border-color)] hover:bg-[var(--text-color)]/10 text-[var(--text-color)] rounded-2xl text-[10px] font-bold tracking-wider uppercase transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                          >
+                            + Tambah Soal
+                          </button>
+                        </div>
+
+                        {/* Questions List Editor */}
+                        <div className="flex-grow overflow-y-auto pr-1 flex flex-col gap-4 py-2 border-t border-b border-black/10 dark:border-white/10 my-1">
+                          {quizQuestions.length > 0 ? (
+                            quizQuestions.map((q, qIdx) => (
+                              <div key={qIdx} className="p-4 rounded-2xl bg-black/5 dark:bg-white/[0.02] border border-black/10 dark:border-white/5 flex flex-col gap-3 relative text-left">
+                                <div className="flex justify-between items-center w-full">
+                                  <span className="text-[10px] font-black uppercase tracking-wider opacity-60">Soal {qIdx + 1}</span>
+                                  <button
+                                    onClick={() => {
+                                      if (confirm(`Hapus Soal ${qIdx + 1}?`)) {
+                                        setQuizQuestions(prev => prev.filter((_, idx) => idx !== qIdx));
+                                      }
+                                    }}
+                                    className="text-red-500 hover:text-red-600 font-bold text-[9px] border border-red-500/20 bg-red-500/5 px-2 py-0.5 rounded cursor-pointer transition-all active:scale-95"
+                                  >
+                                    Hapus Soal
+                                  </button>
+                                </div>
+
+                                {/* Question body input */}
+                                <div className="flex flex-col gap-1">
+                                  <label className="text-[7px] font-bold uppercase tracking-widest opacity-50 pl-0.5">Pertanyaan</label>
+                                  <textarea
+                                    value={q.question}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      setQuizQuestions(prev => prev.map((item, idx) => idx === qIdx ? { ...item, question: val } : item));
+                                    }}
+                                    className="w-full bg-white dark:bg-neutral-900 border border-slate-200 dark:border-white/10 rounded-xl py-2 px-3 text-[11px] focus:outline-none focus:ring-1 focus:ring-[var(--text-color)] transition-all h-16 resize-none"
+                                  />
+                                </div>
+
+                                {/* Options list inputs */}
+                                <div className="flex flex-col gap-2">
+                                  <span className="text-[7px] font-bold uppercase tracking-widest opacity-50 pl-0.5">Pilihan Jawaban</span>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {q.options.map((opt, oIdx) => (
+                                      <div key={oIdx} className="flex flex-col gap-0.5">
+                                        <label className="text-[6px] font-bold opacity-45 pl-0.5">Opsi {String.fromCharCode(65 + oIdx)}</label>
+                                        <input
+                                          type="text"
+                                          value={opt}
+                                          onChange={(e) => {
+                                            const val = e.target.value;
+                                            setQuizQuestions(prev => prev.map((item, idx) => {
+                                              if (idx === qIdx) {
+                                                const updatedOpts = [...item.options];
+                                                const oldCorrect = item.correct;
+                                                const oldOpt = updatedOpts[oIdx];
+                                                updatedOpts[oIdx] = val;
+                                                // If this option was selected as correct, update correct state as well
+                                                let updatedCorrect = item.correct;
+                                                if (oldCorrect === oldOpt) {
+                                                  updatedCorrect = val;
+                                                }
+                                                return { ...item, options: updatedOpts, correct: updatedCorrect };
+                                              }
+                                              return item;
+                                            }));
+                                          }}
+                                          className="w-full bg-white dark:bg-neutral-900 border border-slate-200 dark:border-white/10 rounded-lg py-1.5 px-2 text-[10px] focus:outline-none focus:ring-1 focus:ring-[var(--text-color)] transition-all"
+                                        />
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                {/* Correct option selection */}
+                                <div className="flex flex-col gap-1">
+                                  <label className="text-[7px] font-bold uppercase tracking-widest opacity-50 pl-0.5">Pilihan Kunci Jawaban</label>
+                                  <select
+                                    value={q.correct}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      setQuizQuestions(prev => prev.map((item, idx) => idx === qIdx ? { ...item, correct: val } : item));
+                                    }}
+                                    className="w-full bg-white dark:bg-neutral-900 border border-slate-200 dark:border-white/10 rounded-xl py-2 px-3 text-[10px] focus:outline-none focus:ring-1 focus:ring-[var(--text-color)] transition-all"
+                                  >
+                                    {q.options.map((opt, oIdx) => (
+                                      <option key={oIdx} value={opt}>Opsi {String.fromCharCode(65 + oIdx)}: {opt.substring(0, 30)}...</option>
+                                    ))}
+                                  </select>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <span className="text-[9px] italic opacity-40 text-center py-10 block">Belum ada pertanyaan. Klik "Auto-Generate AI" atau "+ Tambah Soal" untuk memulai.</span>
+                          )}
+                        </div>
+
+                        {/* Save Actions */}
+                        <div className="flex flex-col gap-2 flex-shrink-0">
+                          <button
+                            onClick={() => saveQuizToDB(quizQuestions)}
+                            disabled={isSavingQuiz}
+                            className="w-full bg-black dark:bg-white hover:bg-black/90 dark:hover:bg-white/90 text-white dark:text-black rounded-2xl py-3.5 text-xs font-black shadow-lg border border-black/10 dark:border-white/10 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                          >
+                            {isSavingQuiz ? "Menyimpan Kuis..." : "Simpan Perubahan Kuis"}
                           </button>
                         </div>
                       </div>

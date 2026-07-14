@@ -91,8 +91,7 @@ export default function Navbar() {
     pathname === "/onboarding" ||
     pathname === "/login" ||
     pathname.startsWith("/admin") ||
-    pathname.startsWith("/stats") ||
-    /^\/lesson\/[^/]+\/[^/]+$/.test(pathname)
+    pathname.startsWith("/lesson")
   ) {
     return null;
   }

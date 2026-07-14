@@ -22,8 +22,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Studee - AI Quiz Generator & Learning Platform",
-  description: "Enhance your online learning experience with Studee, the most consistent and fun way to master new skills.",
+  title: "Stry - AI Quiz Generator & Learning Platform",
+  description: "Enhance your online learning experience with Stry, the most consistent and fun way to master new skills.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Stry",
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -37,6 +43,9 @@ export default function RootLayout({ children }) {
           src="https://accounts.google.com/gsi/client" 
           strategy="beforeInteractive"
         />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
       <body className="min-h-full flex flex-col">
         <StreakProvider>

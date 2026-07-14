@@ -53,6 +53,7 @@ export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [modalEmail, setModalEmail] = useState("");
+  const [liveClassLink, setLiveClassLink] = useState("https://meet.google.com");
 
   const handleModalLogin = (e) => {
     e.preventDefault();
@@ -126,6 +127,16 @@ export default function Home() {
     setTimeout(() => {
       setIsLoggedIn(loggedIn);
     }, 0);
+
+    // Fetch dynamic live class link
+    fetch("/api/live-class")
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.link) {
+          setLiveClassLink(data.link);
+        }
+      })
+      .catch(err => console.error("Error loading live class link:", err));
   }, []);
 
   const { courseData: subjects, statsData, loading } = useCourseData();
@@ -1249,7 +1260,7 @@ export default function Home() {
                 <p className="text-[10px] text-white/70 font-medium">
                   Mulai belajar kelas live hari ini
                 </p>
-                <ProtectedCourse subjectId="ui-ux" onClick={() => alert("Mengarah ke kelas UI/UX Live!")}>
+                <ProtectedCourse subjectId="ui-ux" onClick={() => window.open(liveClassLink, "_blank")}>
                   <button
                     className="bg-white text-black hover:bg-white/90 rounded-full px-5 py-2 text-xs font-bold shadow-md transition-all active:scale-95 cursor-pointer"
                   >
@@ -1438,14 +1449,14 @@ export default function Home() {
       {/* Drawer Overlay (Backdrop) */}
       {isProfileDrawerOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity duration-300"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] transition-opacity duration-300"
           onClick={() => setIsProfileDrawerOpen(false)}
         />
       )}
 
       {/* Profile Menu Drawer (Glassmorphism Slide-out panel) */}
       <div
-        className="fixed top-4 right-4 bottom-4 w-[320px] sm:w-[380px] bg-white dark:bg-neutral-950 border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-2xl z-50 flex flex-col items-center gap-6 overflow-y-auto"
+        className="fixed top-4 right-4 bottom-4 w-[320px] sm:w-[380px] bg-white dark:bg-neutral-950 border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-2xl z-[110] flex flex-col items-center gap-6 overflow-y-auto"
         style={{
           transform: isProfileDrawerOpen ? "translateX(0)" : "translateX(120%)",
           transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -1621,7 +1632,7 @@ export default function Home() {
                 setIsNotificationOpen(false);
                 setExpandedNotificationId(null);
               }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 cursor-pointer"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] cursor-pointer"
             />
             {/* Drawer Panel (Floating Glassmorphism Card) */}
             <motion.div
@@ -1629,7 +1640,7 @@ export default function Home() {
               animate={{ x: 0 }}
               exit={{ x: "110%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-4 right-4 bottom-4 w-[320px] sm:w-[380px] bg-white dark:bg-neutral-950 border border-slate-200 dark:border-white/10 rounded-3xl shadow-2xl z-50 flex flex-col justify-between overflow-hidden"
+              className="fixed top-4 right-4 bottom-4 w-[320px] sm:w-[380px] bg-white dark:bg-neutral-950 border border-slate-200 dark:border-white/10 rounded-3xl shadow-2xl z-[110] flex flex-col justify-between overflow-hidden"
             >
               {/* Header */}
               <div className="p-5 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
@@ -1847,7 +1858,7 @@ export default function Home() {
                 setIsSearchOpen(false);
                 setSearchQuery("");
               }}
-              className="fixed inset-0 bg-black/20 backdrop-blur-xl z-50 cursor-pointer"
+              className="fixed inset-0 bg-black/20 backdrop-blur-xl z-[110] cursor-pointer"
             />
 
             {/* Centered Floating Glassmorphic Card */}
@@ -1856,7 +1867,7 @@ export default function Home() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="fixed inset-x-6 top-1/2 -translate-y-1/2 mx-auto max-w-md w-[90%] bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 shadow-2xl z-50 flex flex-col gap-4.5 overflow-hidden backdrop-blur-xl"
+              className="fixed inset-x-6 top-1/2 -translate-y-1/2 mx-auto max-w-md w-[90%] bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 shadow-2xl z-[110] flex flex-col gap-4.5 overflow-hidden backdrop-blur-xl"
             >
               {/* Card Header */}
               <div className="flex justify-between items-center w-full">

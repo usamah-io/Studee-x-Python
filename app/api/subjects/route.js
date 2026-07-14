@@ -30,9 +30,37 @@ const defaultSeedSubjects = [
   }
 ];
 
-// GET: Fetch all subjects from MongoDB Atlas
-export async function GET() {
+// GET: Fetch all subjects or a single subject by ID from MongoDB Atlas
+export async function GET(request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (id) {
+      if (id.length === 24) {
+        const subject = await prisma.subject.findUnique({
+          where: { id }
+        });
+        if (!subject) {
+          return NextResponse.json({ error: "Mata pelajaran tidak ditemukan." }, { status: 404 });
+        }
+        return NextResponse.json(subject);
+      } else {
+        // Fallback for static identifiers
+        const subject = await prisma.subject.findFirst({
+          where: {
+            OR: [
+              { category: { contains: id, mode: "insensitive" } },
+              { title: { contains: id, mode: "insensitive" } }
+            ]
+          }
+        });
+        if (subject) {
+          return NextResponse.json(subject);
+        }
+      }
+    }
+
     let subjects = await prisma.subject.findMany();
     
     // Seed default subjects if database is empty
