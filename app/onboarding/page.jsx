@@ -15,7 +15,7 @@ export default function OnboardingPage() {
     }
     setIsExiting(true);
     setTimeout(() => {
-      router.push("/library");
+      router.push("/dashboard");
     }, 600); // 600ms match duration of ease-out transition
   };
 
