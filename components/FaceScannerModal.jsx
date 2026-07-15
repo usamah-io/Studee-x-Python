@@ -394,7 +394,7 @@ export default function FaceScannerModal({ mode = "login", email = "", onClose, 
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col justify-between bg-black text-white font-sans select-none overflow-hidden">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/75 backdrop-blur-md p-4 font-sans select-none">
       {/* Laser scan animation stylesheet */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes scan-laser {
@@ -404,105 +404,100 @@ export default function FaceScannerModal({ mode = "login", email = "", onClose, 
         }
       `}} />
 
-      {/* Full screen video feed */}
-      <div className="absolute inset-0 w-full h-full z-10 bg-black">
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          className="w-full h-full object-cover scale-x-[-1]"
-        />
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 w-full h-full pointer-events-none scale-x-[-1] z-20"
-        />
-      </div>
+      {/* Centered Modal Card */}
+      <div className="max-w-[320px] w-full bg-neutral-950 border border-white/10 rounded-3xl p-6 shadow-2xl relative overflow-hidden text-center flex flex-col items-center">
+        
+        {/* Top Header inside Card */}
+        <div className="w-full mb-5">
+          <h3 className="text-base font-bold tracking-wider uppercase text-white/90">
+            {mode === "register" ? "Registrasi Wajah" : "Verifikasi Wajah"}
+          </h3>
+          <p className="text-[10px] text-slate-400 mt-1 px-2 leading-relaxed">
+            {mode === "register"
+              ? "Daftarkan wajah Anda untuk login cepat biometrik."
+              : "Posisikan wajah Anda di dalam area kamera."}
+          </p>
+        </div>
 
-      {/* Top Section - Back Button and Clean Title */}
-      <div className="w-full relative z-30 flex items-center justify-center pt-8 px-6">
-        <button
-          type="button"
-          onClick={handleClose}
-          className="w-10 h-10 rounded-full bg-black/45 backdrop-blur-md border border-white/10 flex items-center justify-center text-white absolute left-6 hover:bg-black/60 active:scale-95 transition-all cursor-pointer"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <h3 className="text-xs font-bold tracking-widest uppercase text-white/95">
-          {mode === "register" ? "Registrasi Wajah" : "Verifikasi Wajah"}
-        </h3>
-      </div>
-
-      {/* Middle Section (Face Oval Guide Overlay) */}
-      <div className="relative w-full flex justify-center items-center flex-1 z-30 pointer-events-none">
-        {/* Clean white oval guide */}
-        <div className="w-[240px] h-[320px] border-2 border-white/40 rounded-[50%] relative overflow-hidden flex items-center justify-center">
-          {/* Sweeping clean white laser line inside the oval */}
+        {/* Camera Viewport (Centered Rounded Card Box) */}
+        <div className="relative w-[200px] h-[200px] bg-black rounded-[2rem] overflow-hidden border border-white/10 flex items-center justify-center mb-5 z-10">
+          
+          {/* Sweeping clean white laser line inside the viewport */}
           {!errorMsg && streamActive && (
             <div 
-              className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-white to-transparent shadow-[0_0_8px_white]"
+              className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-white to-transparent shadow-[0_0_8px_white] z-20 pointer-events-none"
               style={{ animation: 'scan-laser 3s ease-in-out infinite', position: 'absolute' }}
             />
           )}
 
           {errorMsg ? (
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center z-40 pointer-events-auto">
-              <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center p-4 text-center z-35">
+              <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-1.5">
+                <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <p className="text-[11px] font-semibold text-red-400 leading-relaxed px-2">{errorMsg}</p>
+              <p className="text-[9px] font-semibold text-red-400 leading-relaxed px-1">{errorMsg}</p>
             </div>
           ) : null}
-        </div>
-      </div>
 
-      {/* Bottom Section - Circular Progress & Controls */}
-      <div className="w-full max-w-xs mx-auto pb-12 relative z-30 text-center space-y-6">
-        {/* SVG Circular Progress Tracker */}
-        <div className="relative w-20 h-20 flex items-center justify-center bg-black/45 backdrop-blur-md rounded-full border border-white/10 mx-auto">
-          <svg className="w-20 h-20 transform -rotate-90">
-            {/* Background circle */}
-            <circle
-              cx="40"
-              cy="40"
-              r="30"
-              className="stroke-white/10"
-              strokeWidth="3.5"
-              fill="transparent"
-            />
-            {/* Active progress circle */}
-            <circle
-              cx="40"
-              cy="40"
-              r="30"
-              className="stroke-white transition-all duration-300"
-              strokeWidth="3.5"
-              fill="transparent"
-              strokeDasharray={2 * Math.PI * 30}
-              strokeDashoffset={2 * Math.PI * 30 - (progress / 100) * (2 * Math.PI * 30)}
-              strokeLinecap="round"
-            />
-          </svg>
-          <span className="absolute text-sm font-mono font-bold text-white">{progress}%</span>
+          {/* Camera stream */}
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className="w-full h-full object-cover scale-x-[-1] z-10"
+          />
+          <canvas
+            ref={canvasRef}
+            className="absolute inset-0 w-full h-full pointer-events-none scale-x-[-1] z-25"
+          />
         </div>
 
-        {/* Status text instruction */}
-        <p className="text-xs font-semibold text-white/80 tracking-wide uppercase px-4 leading-relaxed h-8 flex items-center justify-center">
-          {statusText}
-        </p>
+        {/* Circular Progress & Status Row */}
+        <div className="w-full space-y-4">
+          
+          {/* SVG Circular Progress Tracker */}
+          <div className="relative w-16 h-16 flex items-center justify-center bg-white/5 rounded-full border border-white/5 mx-auto">
+            <svg className="w-16 h-16 transform -rotate-90">
+              <circle
+                cx="32"
+                cy="32"
+                r="24"
+                className="stroke-white/10"
+                strokeWidth="3"
+                fill="transparent"
+              />
+              <circle
+                cx="32"
+                cy="32"
+                r="24"
+                className="stroke-white transition-all duration-300"
+                strokeWidth="3"
+                fill="transparent"
+                strokeDasharray={2 * Math.PI * 24}
+                strokeDashoffset={2 * Math.PI * 24 - (progress / 100) * (2 * Math.PI * 24)}
+                strokeLinecap="round"
+              />
+            </svg>
+            <span className="absolute text-[11px] font-mono font-bold text-white">{progress}%</span>
+          </div>
 
-        {/* Cancel Button */}
-        <button
-          type="button"
-          onClick={handleClose}
-          className="w-full py-4 bg-black/45 backdrop-blur-md hover:bg-black/60 active:scale-[0.97] text-white rounded-full font-bold transition-all shadow-lg border border-white/10 cursor-pointer text-xs tracking-widest uppercase"
-        >
-          Batalkan Scan
-        </button>
+          {/* Status text instruction */}
+          <p className="text-[10px] font-semibold text-white/80 tracking-wide uppercase px-2 h-6 flex items-center justify-center">
+            {statusText}
+          </p>
+
+          {/* Cancel Button */}
+          <button
+            type="button"
+            onClick={handleClose}
+            className="w-full py-3 bg-white/5 hover:bg-white/10 active:scale-[0.97] text-white border border-white/10 rounded-2xl font-bold transition-all text-[10px] tracking-widest uppercase cursor-pointer"
+          >
+            Batalkan Scan
+          </button>
+        </div>
       </div>
     </div>
   );

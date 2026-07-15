@@ -5,6 +5,7 @@ import { StreakProvider } from "../lib/StreakContext";
 import { CourseDataProvider } from "../lib/CourseDataContext";
 import { ThemeProvider } from "../lib/ThemeContext";
 import Navbar from "./components/Navbar";
+import PWARegistration from "../components/PWARegistration";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -51,6 +52,7 @@ export default function RootLayout({ children }) {
         <StreakProvider>
           <CourseDataProvider>
             <ThemeProvider>
+              <PWARegistration />
               {children}
               <Navbar />
             </ThemeProvider>

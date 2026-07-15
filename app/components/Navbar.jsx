@@ -14,9 +14,36 @@ export default function Navbar() {
   const [adminPassword, setAdminPassword] = useState("");
   const [mounted, setMounted] = useState(false);
 
+  const [isInstallable, setIsInstallable] = useState(false);
+
   useEffect(() => {
     setMounted(true);
+    if (typeof window !== "undefined") {
+      if (window.deferredPrompt) {
+        setIsInstallable(true);
+      }
+
+      const handleInstallable = () => {
+        setIsInstallable(true);
+      };
+      window.addEventListener("pwa-installable", handleInstallable);
+      return () => {
+        window.removeEventListener("pwa-installable", handleInstallable);
+      };
+    }
   }, []);
+
+  const handleInstallClick = async () => {
+    if (typeof window !== "undefined" && window.deferredPrompt) {
+      const prompt = window.deferredPrompt;
+      prompt.prompt();
+      const { outcome } = await prompt.userChoice;
+      if (outcome === "accepted") {
+        setIsInstallable(false);
+        window.deferredPrompt = null;
+      }
+    }
+  };
 
   useEffect(() => {
     const loggedIn = localStorage.getItem("isLoggedIn") === "true";
@@ -98,6 +125,23 @@ export default function Navbar() {
 
   return (
     <>
+      <AnimatePresence>
+        {isInstallable && (
+          <motion.button
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            onClick={handleInstallClick}
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-black/85 hover:bg-black/90 dark:bg-zinc-900/90 dark:hover:bg-zinc-900 backdrop-blur-xl border border-white/10 text-white rounded-full py-3 px-6 shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex items-center gap-2.5 z-[100] cursor-pointer active:scale-95 transition-all text-xs font-bold uppercase tracking-wider whitespace-nowrap hover:border-white/20"
+          >
+            <svg className="w-4 h-4 text-purple-400 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            <span>Instal Aplikasi Studee</span>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
       <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 max-w-md w-[calc(100%-2.5rem)] bg-[var(--nav-bg)] backdrop-blur-xl border border-[var(--border-color)] rounded-full py-2.5 px-3 shadow-2xl flex items-center justify-between z-[100] transition-colors duration-300">
         {tabs.map((tab) => (
           <button

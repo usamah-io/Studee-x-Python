@@ -19,12 +19,38 @@ export default function SettingsPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [mounted, setMounted] = useState(false);
  
+  const [isInstallable, setIsInstallable] = useState(false);
+ 
   useEffect(() => {
     setMounted(true);
     if (typeof window !== "undefined") {
       setIsAdmin(localStorage.getItem("userRole") === "admin");
+      
+      if (window.deferredPrompt) {
+        setIsInstallable(true);
+      }
+
+      const handleInstallable = () => {
+        setIsInstallable(true);
+      };
+      window.addEventListener("pwa-installable", handleInstallable);
+      return () => {
+        window.removeEventListener("pwa-installable", handleInstallable);
+      };
     }
   }, []);
+
+  const handleInstallClick = async () => {
+    if (typeof window !== "undefined" && window.deferredPrompt) {
+      const prompt = window.deferredPrompt;
+      prompt.prompt();
+      const { outcome } = await prompt.userChoice;
+      if (outcome === "accepted") {
+        setIsInstallable(false);
+        window.deferredPrompt = null;
+      }
+    }
+  };
  
   const handleLogout = () => {
     if (typeof window !== "undefined") {
@@ -121,6 +147,28 @@ export default function SettingsPage() {
             <span className="text-[10px] text-slate-800 dark:text-white/80 font-bold">{i18n.language === "en" ? "Change" : "Ubah"}</span>
           </div>
  
+          {/* Install App - PWA */}
+          {isInstallable && (
+            <button
+              onClick={handleInstallClick}
+              className="w-full flex items-center justify-between p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 ease-in-out cursor-pointer shadow-sm mt-2 text-slate-800 dark:text-white"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center">
+                  <svg className="w-4.5 h-4.5 text-slate-800 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                </div>
+                <div className="flex flex-col text-left">
+                  <span className="text-xs font-bold">{i18n.language === "en" ? "Install App" : "Instal Aplikasi"}</span>
+                  <span className="text-[9px] text-slate-500 dark:text-white/40 mt-0.5">
+                    {i18n.language === "en" ? "Add Studee to your home screen" : "Tambahkan Studee ke layar utama"}
+                  </span>
+                </div>
+              </div>
+            </button>
+          )}
+
           {/* Log Out Button - Clean Monochrome Style */}
           <button
             onClick={handleLogout}
