@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root, .theme-light {
+  --background-raw: #f4f4f4;
+  --foreground-raw: #000000;
+  
+  --bg-color: #f4f4f4; /* abu-abu sangat cerah/bersih */
+  --text-color: #000000; /* hitam pekat untuk judul & teks utama */
+  --text-muted: #1c1917; /* abu-abu sangat gelap / mendekati hitam untuk teks pendukung agar kontras tinggi */
+  
+  --card-bg: #ffffff; /* background putih solid */
+  --border-color: #d1d5db; /* border abu-abu sedang yang tegas */
+  --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 16px -6px rgba(0, 0, 0, 0.05); /* shadow tegas agar kartu terangkat */
+  --nav-bg: #ffffff;
+}
+
+.dark, .theme-dark {
+  --background-raw: #0a0a0a;
+  --foreground-raw: #ffffff;
+  
+  --bg-color: #0a0a0a; /* hitam pekat premium */
+  --text-color: #ffffff; /* putih murni untuk judul & teks utama */
+  --text-muted: #a0a0a0; /* abu-abu terang untuk teks pendukung */
+  
+  --card-bg: rgba(255, 255, 255, 0.05); /* hitam transparan */
+  --border-color: rgba(255, 255, 255, 0.15); /* border tipis tajam */
+  --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
+  --nav-bg: rgba(10, 10, 10, 0.9);
+}
+
+@theme inline {
+  --color-background: var(--background-raw);
+  --color-foreground: var(--foreground-raw);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-outfit: var(--font-outfit);
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Custom theme utilities with smooth transition (No gradients anywhere) */
+.app-theme-bg {
+  background-color: var(--bg-color) !important;
+  background-image: none !important;
+  color: var(--text-color) !important;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.app-theme-text {
+  color: var(--text-color) !important;
+  transition: color 0.2s ease;
+}
+
+.app-theme-text-muted {
+  color: var(--text-muted) !important;
+  transition: color 0.2s ease;
+}
+
+.app-theme-card {
+  background-color: var(--card-bg) !important;
+  background-image: none !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--card-shadow) !important;
+  backdrop-filter: blur(10px);
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.app-theme-border {
+  border-color: var(--border-color) !important;
+  transition: border-color 0.2s ease;
+}
+
+/* Hide scrollbars */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE & Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari & Opera */
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 12s linear infinite;
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 3s ease-in-out infinite;
+}

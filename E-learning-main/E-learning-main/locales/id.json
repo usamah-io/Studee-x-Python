@@ -1,0 +1,47 @@
+{
+  "common": {
+    "back": "Kembali",
+    "save": "Simpan",
+    "cancel": "Batal"
+  },
+  "dashboard": {
+    "title": "Studee",
+    "search": "Cari",
+    "notification": "Notifikasi",
+    "weeklyStreak": "Weekly Streak Calendar",
+    "streakDays": "{{count}} Hari Streak",
+    "totalLearning": "Total Hari Belajar",
+    "consistency": "Konsistensi",
+    "weeklyInsight": "WEEKLY INSIGHT",
+    "featuredClass": "Ui/Ux Design Live class",
+    "continueLearning": "Lanjut Belajar",
+    "categories": {
+      "all": "All",
+      "favorite": "Favorite",
+      "performance": "Performance",
+      "research": "Research"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "pauseNotifications": "Pause notifications",
+    "darkMode": "Dark mode",
+    "language": "Language",
+    "adminDashboard": "Admin Dashboard",
+    "logOut": "Log Out",
+    "languageModalTitle": "Pilih Bahasa",
+    "languageModalDesc": "Ubah bahasa aplikasi Studee"
+  },
+  "profile": {
+    "title": "My Profile",
+    "editProfile": "Edit Profile",
+    "totalHours": "Total Jam Belajar",
+    "quizzesCompleted": "Quiz Selesai",
+    "feed": "Feed",
+    "challenge": "Challenge",
+    "badge": "Badge",
+    "followers": "Followers",
+    "following": "Following",
+    "streakText": "{{count}} Hari Streak"
+  }
+}

@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  name      String?
+  streak    Int      @default(0)
+  logs      DailyLog[]
+}
+
+model DailyLog {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime @default(now())
+  duration  Int
+}
+model Subject {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  category    String
+  driveLink   String
+  videoUrl    String?
+  quizStatus  String   @default("Belum Ada")
+  questions   Json?    // Menyimpan daftar soal kuis hasil generate AI
+  syllabus    Json?    // Menyimpan daftar sub-materi (silabus)
+}
+
+model AdminEmail {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  email String @unique
+}
