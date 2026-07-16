@@ -1096,7 +1096,7 @@ export default function Home() {
               </h3>
 
               <div className="flex flex-col gap-3 w-full">
-                {statsData.courseList.map((subj) => (
+                {(statsData?.courseList || []).map((subj) => (
                   <div
                     key={subj.id}
                     onClick={() => router.push(`/lesson/${subj.id}`)}

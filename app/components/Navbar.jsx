@@ -116,7 +116,6 @@ export default function Navbar() {
   if (
     pathname === "/" ||
     pathname === "/onboarding" ||
-    pathname === "/login" ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/lesson")
   ) {
@@ -148,7 +147,12 @@ export default function Navbar() {
             key={tab.id}
             onClick={() => {
               if (tab.id === "profile") {
-                router.push("/profile");
+                const logged = typeof window !== "undefined" && localStorage.getItem("isLoggedIn") === "true";
+                if (!logged) {
+                  router.push("/login?redirectTo=/profile");
+                } else {
+                  router.push("/profile");
+                }
                 return;
               }
               if (tab.id === "stats") {
@@ -156,7 +160,7 @@ export default function Navbar() {
                 return;
               }
               if (tab.id === "home") {
-                router.push("/dashboard");
+                router.push("/");
                 return;
               }
               if (tab.id === "learn") {

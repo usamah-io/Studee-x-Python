@@ -7,7 +7,7 @@ export function middleware(request) {
   const userRole = request.cookies.get('userRole')?.value;
 
   // List of protected routes that require login
-  const protectedRoutes = ['/lesson', '/profile', '/stats'];
+  const protectedRoutes = ['/lesson', '/profile'];
 
   // 1. Redirect to /login if trying to access protected routes while logged out
   const isAccessingProtectedRoute = protectedRoutes.some(route => url.pathname.startsWith(route));
@@ -33,7 +33,6 @@ export const config = {
   matcher: [
     '/admin', '/admin/:path*',
     '/lesson', '/lesson/:path*',
-    '/profile', '/profile/:path*',
-    '/stats', '/stats/:path*'
+    '/profile', '/profile/:path*'
   ],
 };

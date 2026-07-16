@@ -160,15 +160,15 @@ export default function Login() {
       <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-white/3 blur-[120px] pointer-events-none" />
 
       {/* Back to Home Button */}
-      <Link
-        href={backHref}
-        className="absolute top-6 left-6 flex items-center gap-2 app-theme-text-muted app-theme-card hover:bg-black/5 dark:hover:bg-white/5 rounded-xl py-2 px-4 transition-all text-sm hover:shadow-[0_0_15px_rgba(255,255,255,0.06)]"
+      <button
+        onClick={() => router.push(backHref)}
+        className="absolute top-6 left-6 flex items-center gap-2 app-theme-text-muted app-theme-card hover:bg-black/5 dark:hover:bg-white/5 rounded-xl py-2 px-4 transition-all text-sm hover:shadow-[0_0_15px_rgba(255,255,255,0.06)] cursor-pointer"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
         Kembali
-      </Link>
+      </button>
 
       <div className="max-w-md w-full app-theme-card rounded-3xl p-8 md:p-10 shadow-2xl relative overflow-hidden">
         {/* Glow behind card header */}

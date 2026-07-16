@@ -10,6 +10,7 @@ export function CourseDataProvider({ children }) {
     totalStudyTime: 185,
     streakCount: 5,
     lastStudyDate: "2026-07-01",
+    courseList: [],
   });
   const [hasFaceId, setHasFaceId] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -56,6 +57,7 @@ export function CourseDataProvider({ children }) {
           totalStudyTime: 185,
           streakCount: 5,
           lastStudyDate: "2026-07-01",
+          courseList: [],
         });
       }
     } catch (err) {
