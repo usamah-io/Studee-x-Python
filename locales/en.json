@@ -2,7 +2,11 @@
   "common": {
     "back": "Back",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "home": "Home",
+    "learn": "Learn",
+    "stats": "Stats",
+    "profile": "Profile"
   },
   "dashboard": {
     "title": "Studee",
@@ -12,9 +16,13 @@
     "streakDays": "{{count}} Days Streak",
     "totalLearning": "Total Learning Days",
     "consistency": "Consistency",
+    "averageConsistency": "Average Consistency",
+    "excellent": "Excellent (85%)",
     "weeklyInsight": "WEEKLY INSIGHT",
     "featuredClass": "Ui/Ux Design Live class",
+    "startLearningLive": "Start learning live class today",
     "continueLearning": "Continue Learning",
+    "courseProgress": "Course Progress",
     "categories": {
       "all": "All",
       "favorite": "Favorite",
@@ -35,8 +43,13 @@
   "profile": {
     "title": "My Profile",
     "editProfile": "Edit Profile",
-    "totalHours": "Total Learning Hours",
+    "totalLearning": "Total Learning",
     "quizzesCompleted": "Quizzes Completed",
+    "faceIdAuth": "Face ID Authentication",
+    "faceIdActive": "Face ID is active on this account.",
+    "faceIdInactive": "Instant login using camera.",
+    "btnDelete": "Delete",
+    "btnEnable": "Enable",
     "feed": "Feed",
     "challenge": "Challenge",
     "badge": "Badge",

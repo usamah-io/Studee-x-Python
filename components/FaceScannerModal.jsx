@@ -12,11 +12,15 @@ export default function FaceScannerModal({ mode = "login", email = "", onClose, 
   const [streamActive, setStreamActive] = useState(false);
   const [scanComplete, setScanComplete] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [step, setStep] = useState("name"); // "name" | "welcome" | "scan"
+  const [inputName, setInputName] = useState("");
+  const [isFaceCentered, setIsFaceCentered] = useState(false);
 
   // Array untuk menampung sampel descriptor agar hasil rata-rata lebih presisi
   const collectedDescriptors = useRef([]);
   const animationFrameId = useRef(null);
   const localStream = useRef(null);
+  const isCapturing = useRef(false);
 
   // 1. Load face-api.js script secara dinamis dari CDN
   useEffect(() => {
@@ -68,11 +72,14 @@ export default function FaceScannerModal({ mode = "login", email = "", onClose, 
     loadModels();
   }, [faceApiLoaded]);
 
-  // 3. Jalankan webcam stream setelah model siap
+  // 3. Jalankan webcam stream setelah model siap dan langkah scan aktif
   useEffect(() => {
-    if (!modelsLoaded) return;
+    if (!modelsLoaded || step !== "scan") return;
+    let isMounted = true;
 
     async function startCamera() {
+      if (isCapturing.current) return;
+      isCapturing.current = true;
       try {
         const constraints = {
           video: { 
@@ -82,6 +89,9 @@ export default function FaceScannerModal({ mode = "login", email = "", onClose, 
           },
           audio: false,
         };
+
+        // Stop any running stream
+        stopCamera();
 
         let stream;
         
@@ -97,17 +107,25 @@ export default function FaceScannerModal({ mode = "login", email = "", onClose, 
                 getUserMedia.call(navigator, constraints, resolve, reject);
               });
             } else {
-              // Jika diakses menggunakan HTTP pada IP lokal (bukan localhost), berikan informasi jelas
               if (window.location.protocol !== "https:" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
                 setErrorMsg("Akses kamera diblokir browser karena koneksi tidak aman (HTTP). Silakan gunakan HTTPS (misal: Ngrok) untuk pengujian di Handphone.");
               } else {
                 setErrorMsg("Browser Anda tidak mendukung akses kamera webcam.");
               }
+              isCapturing.current = false;
               return;
             }
           }
         } else {
           setErrorMsg("Browser environment tidak terdeteksi.");
+          isCapturing.current = false;
+          return;
+        }
+
+        if (!isMounted) {
+          // Jika komponen di-unmount selama proses await, hentikan stream segera
+          stream.getTracks().forEach((track) => track.stop());
+          isCapturing.current = false;
           return;
         }
 
@@ -119,7 +137,35 @@ export default function FaceScannerModal({ mode = "login", email = "", onClose, 
         }
       } catch (err) {
         console.error("Gagal membuka kamera:", err);
-        setErrorMsg(err.message || "Kamera tidak dapat diakses.");
+        if (err.name === "NotReadableError" || err.message?.includes("Could not start video source")) {
+          // Tunggu sebentar dan coba sekali lagi (Fast Refresh/Strict Mode lock resolution)
+          await new Promise((resolve) => setTimeout(resolve, 800));
+          if (isMounted) {
+            try {
+              const retryStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+              if (!isMounted) {
+                retryStream.getTracks().forEach((track) => track.stop());
+                isCapturing.current = false;
+                return;
+              }
+              if (videoRef.current) {
+                videoRef.current.srcObject = retryStream;
+                localStream.current = retryStream;
+                setStreamActive(true);
+                setStatusText("Posisikan wajah Anda di tengah lingkaran");
+                isCapturing.current = false;
+                return;
+              }
+            } catch (retryErr) {
+              console.error("Percobaan ulang kamera gagal:", retryErr);
+              setErrorMsg("Kamera sedang digunakan oleh tab lain atau aplikasi lain. Harap tutup tab/aplikasi tersebut.");
+            }
+          }
+        } else {
+          setErrorMsg(err.message || "Kamera tidak dapat diakses.");
+        }
+      } finally {
+        isCapturing.current = false;
       }
     }
 
@@ -127,22 +173,34 @@ export default function FaceScannerModal({ mode = "login", email = "", onClose, 
 
     // Cleanup
     return () => {
+      isMounted = false;
       stopCamera();
     };
-  }, [modelsLoaded]);
+  }, [modelsLoaded, step]);
 
   const stopCamera = () => {
     if (animationFrameId.current) {
       cancelAnimationFrame(animationFrameId.current);
     }
     if (localStream.current) {
-      localStream.current.getTracks().forEach((track) => track.stop());
+      localStream.current.getTracks().forEach((track) => {
+        try {
+          track.stop();
+        } catch (e) {
+          console.error("Gagal menghentikan track kamera:", e);
+        }
+      });
+      localStream.current = null;
     }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    setStreamActive(false);
   };
 
   // 4. Proses Loop Scan dan Pencarian Landmark Wajah
   useEffect(() => {
-    if (!streamActive || !videoRef.current || scanComplete) return;
+    if (!streamActive || !videoRef.current || scanComplete || step !== "scan") return;
 
     let localProgress = 0;
     const requiredSamples = 5; // Kita kumpulkan 5 frame wajah yang bagus untuk rata-rata agar stabil
@@ -192,77 +250,6 @@ export default function FaceScannerModal({ mode = "login", email = "", onClose, 
         const { box } = detection.detection;
         const positions = detection.landmarks.positions;
 
-        // --- GAMBAR CYBERNETIC FACE MESH (MediaPipe-Style) ---
-        ctx.strokeStyle = "rgba(6, 182, 212, 0.4)"; // Cyan transparan
-        ctx.lineWidth = 1;
-
-        // 1. Garis Rahang (Jaw Outline)
-        ctx.beginPath();
-        ctx.moveTo(positions[0].x, positions[0].y);
-        for (let i = 1; i <= 16; i++) ctx.lineTo(positions[i].x, positions[i].y);
-        ctx.stroke();
-
-        // 2. Alis Kiri (Left Eyebrow)
-        ctx.beginPath();
-        ctx.moveTo(positions[17].x, positions[17].y);
-        for (let i = 18; i <= 21; i++) ctx.lineTo(positions[i].x, positions[i].y);
-        ctx.stroke();
-
-        // 3. Alis Kanan (Right Eyebrow)
-        ctx.beginPath();
-        ctx.moveTo(positions[22].x, positions[22].y);
-        for (let i = 23; i <= 26; i++) ctx.lineTo(positions[i].x, positions[i].y);
-        ctx.stroke();
-
-        // 4. Batang Hidung (Nose Bridge)
-        ctx.beginPath();
-        ctx.moveTo(positions[27].x, positions[27].y);
-        for (let i = 28; i <= 30; i++) ctx.lineTo(positions[i].x, positions[i].y);
-        ctx.stroke();
-
-        // 5. Cuping Hidung (Nose Bottom)
-        ctx.beginPath();
-        ctx.moveTo(positions[31].x, positions[31].y);
-        for (let i = 32; i <= 35; i++) ctx.lineTo(positions[i].x, positions[i].y);
-        ctx.stroke();
-
-        // 6. Mata Kiri (Left Eye)
-        ctx.beginPath();
-        ctx.moveTo(positions[36].x, positions[36].y);
-        for (let i = 37; i <= 41; i++) ctx.lineTo(positions[i].x, positions[i].y);
-        ctx.closePath();
-        ctx.stroke();
-
-        // 7. Mata Kanan (Right Eye)
-        ctx.beginPath();
-        ctx.moveTo(positions[42].x, positions[42].y);
-        for (let i = 43; i <= 47; i++) ctx.lineTo(positions[i].x, positions[i].y);
-        ctx.closePath();
-        ctx.stroke();
-
-        // 8. Bibir Luar (Outer Lips)
-        ctx.beginPath();
-        ctx.moveTo(positions[48].x, positions[48].y);
-        for (let i = 49; i <= 59; i++) ctx.lineTo(positions[i].x, positions[i].y);
-        ctx.closePath();
-        ctx.stroke();
-
-        // 9. Bibir Dalam (Inner Lips)
-        ctx.beginPath();
-        ctx.moveTo(positions[60].x, positions[60].y);
-        for (let i = 61; i <= 67; i++) ctx.lineTo(positions[i].x, positions[i].y);
-        ctx.closePath();
-        ctx.stroke();
-
-        // 10. Titik Sensor Menyala (Glowing Cyan Sensor Nodes)
-        ctx.fillStyle = "#22d3ee"; // Bright cyan
-        for (let i = 0; i < positions.length; i++) {
-          ctx.beginPath();
-          ctx.arc(positions[i].x, positions[i].y, 1.8, 0, 2 * Math.PI);
-          ctx.fill();
-        }
-        // ----------------------------------------------------
-        
         // Verifikasi apakah posisi wajah berada di tengah area lingkaran deteksi
         const canvasCenterX = canvas.width / 2;
         const canvasCenterY = canvas.height / 2;
@@ -276,13 +263,7 @@ export default function FaceScannerModal({ mode = "login", email = "", onClose, 
         // Jika wajah relatif di tengah
         if (distanceToCenter < 120 && box.width > 120) {
           setStatusText("Memindai... Jangan bergerak.");
-          
-          // Gambar lingkaran hijau pelacak wajah
-          ctx.strokeStyle = "#10B981";
-          ctx.lineWidth = 3;
-          ctx.beginPath();
-          ctx.arc(faceCenterX, faceCenterY, box.width / 2 + 10, 0, 2 * Math.PI);
-          ctx.stroke();
+          setIsFaceCentered(true);
 
           // Simpan descriptor
           collectedDescriptors.current.push(Array.from(detection.descriptor));
@@ -307,16 +288,12 @@ export default function FaceScannerModal({ mode = "login", email = "", onClose, 
             return;
           }
         } else {
-          setStatusText("Dekatkan wajah Anda ke tengah lingkaran.");
-          // Gambar lingkaran kuning instruksi
-          ctx.strokeStyle = "#F59E0B";
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.arc(faceCenterX, faceCenterY, box.width / 2 + 10, 0, 2 * Math.PI);
-          ctx.stroke();
+          setStatusText("Dekatkan wajah Anda ke tengah bingkai.");
+          setIsFaceCentered(false);
         }
       } else {
         setStatusText("Wajah tidak terdeteksi.");
+        setIsFaceCentered(false);
       }
 
       if (!scanComplete) {
@@ -345,7 +322,7 @@ export default function FaceScannerModal({ mode = "login", email = "", onClose, 
     return () => {
       if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
     };
-  }, [streamActive, scanComplete]);
+  }, [streamActive, scanComplete, step]);
 
   // 5. Hubungkan ke backend API setelah scan 100%
   const handleScanSuccess = async (descriptor) => {
@@ -393,8 +370,128 @@ export default function FaceScannerModal({ mode = "login", email = "", onClose, 
     onClose();
   };
 
+  if (step === "name") {
+    return (
+      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black text-white font-sans p-6 overflow-hidden select-none">
+        {/* Glow background */}
+        <div className="absolute top-[-10%] left-[-10%] w-[350px] h-[350px] rounded-full bg-white/5 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] rounded-full bg-white/3 blur-[120px] pointer-events-none" />
+
+        <div className="w-full max-w-sm flex flex-col gap-8 relative z-10">
+          <div className="text-center space-y-3">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/90 text-xs font-bold uppercase tracking-wider mb-2 shadow-lg">
+              <span className="w-2 h-2 rounded-full bg-white"></span>
+              Face ID Verification
+            </div>
+            <h2 className="text-3xl font-black tracking-tight text-white">Masukkan Nama Anda</h2>
+            <p className="text-sm text-white/50">Tuliskan nama Anda untuk memulai proses autentikasi.</p>
+          </div>
+
+          <div className="space-y-4">
+            <input
+              type="text"
+              placeholder="Nama Lengkap..."
+              value={inputName}
+              onChange={(e) => setInputName(e.target.value)}
+              className="w-full bg-white/5 border border-white/10 text-white placeholder-white/30 rounded-2xl px-5 py-4 text-sm font-semibold focus:border-white/30 focus:outline-none transition-all duration-300 shadow-inner"
+            />
+            <button
+              onClick={() => {
+                if (inputName.trim()) {
+                  setStep("welcome");
+                }
+              }}
+              disabled={!inputName.trim()}
+              className="w-full py-4 bg-white disabled:bg-white/20 disabled:text-white/40 text-black hover:bg-gray-100 disabled:hover:bg-white/20 font-bold rounded-2xl shadow-xl transition-all duration-300 ease-in-out active:scale-[0.98] cursor-pointer text-sm tracking-wide"
+            >
+              LANJUTKAN
+            </button>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="text-xs font-bold uppercase tracking-widest text-white/40 hover:text-white/80 transition-colors cursor-pointer text-center mt-2"
+          >
+            Batal
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (step === "welcome") {
+    return (
+      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black text-white font-sans p-6 overflow-hidden select-none">
+        {/* Glow background */}
+        <div className="absolute top-[-10%] left-[-10%] w-[350px] h-[350px] rounded-full bg-white/5 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] rounded-full bg-white/3 blur-[120px] pointer-events-none" />
+
+        <div className="w-full max-w-sm flex flex-col gap-8 text-center relative z-10">
+          <div className="space-y-6">
+            {/* Animated Face Scanner Icon (Black & White) */}
+            <div className="relative w-48 h-48 mx-auto flex items-center justify-center">
+              {/* Radial ticks (circular pattern of lines) using SVG */}
+              <svg className="absolute inset-0 w-full h-full text-white/20 animate-[spin_60s_linear_infinite]" viewBox="0 0 100 100">
+                {Array.from({ length: 60 }).map((_, i) => {
+                  const angle = (i * 360) / 60;
+                  return (
+                    <line
+                      key={i}
+                      x1="50"
+                      y1="6"
+                      x2="50"
+                      y2="14"
+                      transform={`rotate(${angle} 50 50)`}
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                    />
+                  );
+                })}
+              </svg>
+
+              {/* Center Smiley Face Box */}
+              <div className="w-24 h-24 rounded-3xl border border-white/20 flex flex-col items-center justify-center bg-white/5 backdrop-blur-md shadow-2xl relative">
+                {/* Eyes */}
+                <div className="flex gap-4 mb-3">
+                  <span className="w-2 h-2 rounded-full bg-white/70"></span>
+                  <span className="w-2 h-2 rounded-full bg-white/70"></span>
+                </div>
+                {/* Smile */}
+                <svg className="w-8 h-4 text-white/70" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 12">
+                  <path d="M2 2c4 8 16 8 20 0" strokeLinecap="round" />
+                </svg>
+              </div>
+            </div>
+
+            <div className="space-y-2 pt-2">
+              <h2 className="text-3xl font-black tracking-tight text-white leading-tight">Hello {inputName}</h2>
+              <p className="text-sm text-white/50 max-w-[280px] mx-auto leading-relaxed">
+                Gunakan Face ID untuk masuk ke akun Anda.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <button
+              onClick={() => setStep("scan")}
+              className="w-full py-4 bg-white text-black hover:bg-gray-150 font-bold rounded-2xl shadow-xl transition-all duration-300 ease-in-out active:scale-[0.98] cursor-pointer text-sm tracking-wide"
+            >
+              GET STARTED
+            </button>
+            <button
+              onClick={() => setStep("name")}
+              className="text-xs font-bold uppercase tracking-widest text-white/40 hover:text-white/80 transition-colors cursor-pointer block mx-auto pt-2"
+            >
+              Ganti Nama
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col justify-between bg-black text-white font-sans select-none overflow-hidden">
+    <div className="fixed inset-0 z-[9999] flex flex-col justify-between bg-black text-white font-sans select-none overflow-hidden py-12 px-6">
       {/* Laser scan animation stylesheet */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes scan-laser {
@@ -404,8 +501,27 @@ export default function FaceScannerModal({ mode = "login", email = "", onClose, 
         }
       `}} />
 
-      {/* Fullscreen Video Background */}
-      <div className="absolute inset-0 z-0 bg-black">
+      {/* Top Section */}
+      <div className="w-full max-w-md mx-auto text-center space-y-4">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/60 text-[10px] font-bold uppercase tracking-widest shadow-lg">
+          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+          Sistem Autentikasi Biometrik
+        </div>
+        <div className="space-y-2">
+          <h3 className="text-2xl font-black text-white tracking-tight">
+            {mode === "register" ? "DAFTARKAN WAJAH" : "SCAN MASUK FACE ID"}
+          </h3>
+          <p className="text-xs text-white/50 px-6 leading-relaxed">
+            {mode === "register"
+              ? "Pindai wajah Anda untuk mendaftarkan kunci login."
+              : "Posisikan wajah Anda di depan kamera untuk verifikasi masuk."}
+          </p>
+        </div>
+      </div>
+
+      {/* Middle Section: Centered Camera Frame */}
+      <div className="relative w-72 h-72 sm:w-80 sm:h-80 rounded-[40px] overflow-hidden border border-white/10 bg-zinc-950 shadow-[0_0_50px_rgba(255,255,255,0.02)] mx-auto flex-shrink-0">
+        {/* Video stream */}
         <video
           ref={videoRef}
           autoPlay
@@ -413,13 +529,22 @@ export default function FaceScannerModal({ mode = "login", email = "", onClose, 
           muted
           className="w-full h-full object-cover scale-x-[-1]"
         />
+        
+        {/* Canvas (hidden or clear) */}
         <canvas
           ref={canvasRef}
-          className="absolute top-0 left-0 w-full h-full pointer-events-none scale-x-[-1]"
+          className="absolute top-0 left-0 w-full h-full pointer-events-none scale-x-[-1] hidden"
         />
-        
-        {/* Subtle dark overlay for better text contrast */}
-        <div className="absolute inset-0 bg-black/30 pointer-events-none"></div>
+
+        {/* White Corner Borders */}
+        {/* Top-Left */}
+        <div className={`absolute top-4 left-4 w-8 h-8 border-t-4 border-l-4 rounded-tl-2xl transition-colors duration-300 ${isFaceCentered ? "border-white" : "border-white/20"}`}></div>
+        {/* Top-Right */}
+        <div className={`absolute top-4 right-4 w-8 h-8 border-t-4 border-r-4 rounded-tr-2xl transition-colors duration-300 ${isFaceCentered ? "border-white" : "border-white/20"}`}></div>
+        {/* Bottom-Left */}
+        <div className={`absolute bottom-4 left-4 w-8 h-8 border-b-4 border-l-4 rounded-bl-2xl transition-colors duration-300 ${isFaceCentered ? "border-white" : "border-white/20"}`}></div>
+        {/* Bottom-Right */}
+        <div className={`absolute bottom-4 right-4 w-8 h-8 border-b-4 border-r-4 rounded-br-2xl transition-colors duration-300 ${isFaceCentered ? "border-white" : "border-white/20"}`}></div>
 
         {/* Scanning Laser Line (White) */}
         {!errorMsg && streamActive && (
@@ -429,58 +554,43 @@ export default function FaceScannerModal({ mode = "login", email = "", onClose, 
           />
         )}
 
-        {/* Circular Progress Overlay */}
-        {!errorMsg && streamActive && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
-            <div className="w-24 h-24 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
-              <span className="text-white font-bold text-2xl">{progress}%</span>
-            </div>
-          </div>
-        )}
-
-        {errorMsg ? (
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-md z-30 flex flex-col items-center justify-center p-6 text-center">
-            <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center text-white mb-4">
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {/* Error Message overlay inside frame */}
+        {errorMsg && (
+          <div className="absolute inset-0 bg-black/80 z-20 flex flex-col items-center justify-center p-6 text-center">
+            <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white mb-3">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
-            <p className="text-sm font-semibold text-white px-4 leading-relaxed">{errorMsg}</p>
+            <p className="text-xs font-semibold text-white px-2 leading-relaxed">{errorMsg}</p>
           </div>
-        ) : null}
-      </div>
-
-      {/* Top Section */}
-      <div className="w-full max-w-md mx-auto text-center pt-16 relative z-20 pointer-events-none">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/50 backdrop-blur-md border border-white/20 text-white/90 text-xs font-bold uppercase tracking-wider mb-6 animate-pulse shadow-lg">
-          <span className="w-2 h-2 rounded-full bg-white"></span>
-          Autentikasi Biometrik
-        </div>
-        <h3 className="text-3xl font-black text-white tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-          {mode === "register" ? "DAFTARKAN WAJAH" : "VERIFIKASI WAJAH"}
-        </h3>
-        <p className="text-sm text-white/90 mt-3 px-6 leading-relaxed font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-          {mode === "register"
-            ? "Pindai wajah Anda untuk mendaftarkan kunci login."
-            : "Posisikan wajah Anda di depan kamera untuk masuk."}
-        </p>
+        )}
       </div>
 
       {/* Bottom Section */}
-      <div className="w-full max-w-md mx-auto pb-12 relative z-20 space-y-6">
-        {/* Status */}
-        <div className="flex justify-center items-center text-sm font-bold px-2 text-center">
-          <span className="text-white tracking-wide uppercase bg-black/50 px-5 py-2.5 rounded-full backdrop-blur-md shadow-lg border border-white/10">
-            {statusText}
-          </span>
-        </div>
+      <div className="w-full max-w-md mx-auto space-y-6">
+        {/* Status Text & Horizontal Progress */}
+        {!errorMsg && streamActive && (
+          <div className="w-full max-w-xs mx-auto space-y-3">
+            <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-white/50">
+              <span className="truncate max-w-[200px]">{statusText}</span>
+              <span className="text-white font-black">{progress}%</span>
+            </div>
+            <div className="w-full bg-white/10 rounded-full h-1 overflow-hidden">
+              <div 
+                className="bg-white h-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Cancel Scan Button */}
         <div className="px-6">
           <button
             type="button"
             onClick={handleClose}
-            className="w-full py-4 bg-white hover:bg-gray-200 text-black rounded-2xl font-bold transition-all shadow-xl active:scale-[0.98] cursor-pointer text-sm tracking-wide"
+            className="w-full py-4 border border-white/20 hover:bg-white/5 text-white rounded-2xl font-bold transition-all active:scale-[0.98] cursor-pointer text-sm tracking-wide"
           >
             BATALKAN SCAN
           </button>

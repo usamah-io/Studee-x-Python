@@ -14,6 +14,7 @@ model User {
   streak         Int      @default(0)
   logs           DailyLog[]
   faceDescriptor Float[]
+  language       String   @default("id")
 }
 
 model DailyLog {

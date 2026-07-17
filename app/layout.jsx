@@ -6,6 +6,7 @@ import { CourseDataProvider } from "../lib/CourseDataContext";
 import { ThemeProvider } from "../lib/ThemeContext";
 import Navbar from "./components/Navbar";
 import PWARegistration from "../components/PWARegistration";
+import PWAInstallButton from "../components/PWAInstallButton";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -44,6 +45,15 @@ export default function RootLayout({ children }) {
           src="https://accounts.google.com/gsi/client" 
           strategy="beforeInteractive"
         />
+        <Script id="pwa-install-interceptor" strategy="beforeInteractive">
+          {`
+            window.addEventListener('beforeinstallprompt', (e) => {
+              e.preventDefault();
+              window.deferredPrompt = e;
+              window.dispatchEvent(new Event('pwa-installable'));
+            });
+          `}
+        </Script>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
@@ -54,6 +64,7 @@ export default function RootLayout({ children }) {
             <ThemeProvider>
               <PWARegistration />
               {children}
+              <PWAInstallButton />
               <Navbar />
             </ThemeProvider>
           </CourseDataProvider>

@@ -2,7 +2,11 @@
   "common": {
     "back": "Kembali",
     "save": "Simpan",
-    "cancel": "Batal"
+    "cancel": "Batal",
+    "home": "Beranda",
+    "learn": "Belajar",
+    "stats": "Statistik",
+    "profile": "Profil"
   },
   "dashboard": {
     "title": "Studee",
@@ -12,9 +16,13 @@
     "streakDays": "{{count}} Hari Streak",
     "totalLearning": "Total Hari Belajar",
     "consistency": "Konsistensi",
+    "averageConsistency": "Rata-rata Konsistensi",
+    "excellent": "Sangat Baik (85%)",
     "weeklyInsight": "WEEKLY INSIGHT",
     "featuredClass": "Ui/Ux Design Live class",
+    "startLearningLive": "Mulai belajar kelas live hari ini",
     "continueLearning": "Lanjut Belajar",
+    "courseProgress": "Progres Belajar",
     "categories": {
       "all": "All",
       "favorite": "Favorite",
@@ -33,15 +41,20 @@
     "languageModalDesc": "Ubah bahasa aplikasi Studee"
   },
   "profile": {
-    "title": "My Profile",
-    "editProfile": "Edit Profile",
-    "totalHours": "Total Jam Belajar",
-    "quizzesCompleted": "Quiz Selesai",
+    "title": "Profil Saya",
+    "editProfile": "Edit Profil",
+    "totalLearning": "Total Belajar",
+    "quizzesCompleted": "Kuis Selesai",
+    "faceIdAuth": "Autentikasi Face ID",
+    "faceIdActive": "Face ID aktif di akun ini.",
+    "faceIdInactive": "Login instan menggunakan kamera.",
+    "btnDelete": "Hapus",
+    "btnEnable": "Aktifkan",
     "feed": "Feed",
-    "challenge": "Challenge",
-    "badge": "Badge",
-    "followers": "Followers",
-    "following": "Following",
+    "challenge": "Tantangan",
+    "badge": "Lencana",
+    "followers": "Pengikut",
+    "following": "Mengikuti",
     "streakText": "{{count}} Hari Streak"
   }
 }

@@ -69,6 +69,28 @@ export default function SettingsPage() {
   const getLanguageLabel = () => {
     return i18n.language === "en" ? "English (US)" : "Bahasa Indonesia";
   };
+
+  const handleLanguageChange = async (lang) => {
+    i18n.changeLanguage(lang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("studee_language", lang);
+      const email = localStorage.getItem("userEmail");
+      if (email) {
+        try {
+          await fetch("/api/user-dashboard", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, language: lang }),
+          });
+        } catch (error) {
+          console.error("Gagal sinkronisasi bahasa ke MongoDB:", error);
+        }
+      }
+    }
+    setIsLanguageModalOpen(false);
+  };
  
   if (!mounted) {
     return null;
@@ -147,6 +169,19 @@ export default function SettingsPage() {
             <span className="text-[10px] text-slate-800 dark:text-white/80 font-bold">{i18n.language === "en" ? "Change" : "Ubah"}</span>
           </div>
  
+          {/* Log Out Button - Clean Monochrome Style */}
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-between p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 ease-in-out cursor-pointer shadow-sm mt-4 text-slate-800 dark:text-white"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center">
+                <LogOut className="w-4.5 h-4.5 text-slate-800 dark:text-white" />
+              </div>
+              <span className="text-xs font-bold">{t("settings.logOut")}</span>
+            </div>
+          </button>
+
           {/* Install App - PWA */}
           {isInstallable && (
             <button
@@ -160,7 +195,7 @@ export default function SettingsPage() {
                   </svg>
                 </div>
                 <div className="flex flex-col text-left">
-                  <span className="text-xs font-bold">{i18n.language === "en" ? "Install App" : "Instal Aplikasi"}</span>
+                  <span className="text-xs font-bold">Install Studee App</span>
                   <span className="text-[9px] text-slate-500 dark:text-white/40 mt-0.5">
                     {i18n.language === "en" ? "Add Studee to your home screen" : "Tambahkan Studee ke layar utama"}
                   </span>
@@ -168,19 +203,6 @@ export default function SettingsPage() {
               </div>
             </button>
           )}
-
-          {/* Log Out Button - Clean Monochrome Style */}
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center justify-between p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 ease-in-out cursor-pointer shadow-sm mt-4 text-slate-800 dark:text-white"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center">
-                <LogOut className="w-4.5 h-4.5 text-slate-800 dark:text-white" />
-              </div>
-              <span className="text-xs font-bold">{t("settings.logOut")}</span>
-            </div>
-          </button>
  
         </div>
  
@@ -214,11 +236,7 @@ export default function SettingsPage() {
               <div className="flex flex-col gap-2.5">
                 {/* Bahasa Indonesia */}
                 <button
-                  onClick={() => {
-                    i18n.changeLanguage("id");
-                    localStorage.setItem("studee_language", "id");
-                    setIsLanguageModalOpen(false);
-                  }}
+                  onClick={() => handleLanguageChange("id")}
                   className={`w-full p-3.5 rounded-xl border text-xs font-bold transition-all text-left flex justify-between items-center cursor-pointer ${
                     i18n.language === "id"
                       ? "bg-black/5 dark:bg-white/10 border-black/20 dark:border-white/20 text-slate-900 dark:text-white"
@@ -228,14 +246,10 @@ export default function SettingsPage() {
                   <span>Bahasa Indonesia</span>
                   {i18n.language === "id" && <span className="text-[10px] bg-black dark:bg-white text-white dark:text-black px-2 py-0.5 rounded-md">Aktif</span>}
                 </button>
- 
+
                 {/* English */}
                 <button
-                  onClick={() => {
-                    i18n.changeLanguage("en");
-                    localStorage.setItem("studee_language", "en");
-                    setIsLanguageModalOpen(false);
-                  }}
+                  onClick={() => handleLanguageChange("en")}
                   className={`w-full p-3.5 rounded-xl border text-xs font-bold transition-all text-left flex justify-between items-center cursor-pointer ${
                     i18n.language === "en"
                       ? "bg-black/5 dark:bg-white/10 border-black/20 dark:border-white/20 text-slate-900 dark:text-white"

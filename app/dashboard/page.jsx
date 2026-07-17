@@ -17,6 +17,7 @@ import {
 import { useStreak } from "../../lib/StreakContext";
 import { useCourseData } from "../../lib/CourseDataContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import "../../lib/i18n";
 import { useTheme } from "../../lib/ThemeContext";
 import { calculateStreakStatus } from "../../constants/statsData";
@@ -46,6 +47,7 @@ function AnimatedNumber({ value, duration = 1200 }) {
 
 
 export default function Home() {
+  const { t } = useTranslation();
   const { isDarkMode, toggleTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("All");
@@ -631,8 +633,8 @@ export default function Home() {
 
         {/* Footer Stat Ringkasan */}
         <div className="mt-4 pt-3 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-xs text-slate-500 dark:text-white/50 font-medium">
-          <span>Rata-rata Konsistensi</span>
-          <span className="text-emerald-600 dark:text-emerald-400 font-bold">Sangat Baik (85%)</span>
+          <span>{t("dashboard.averageConsistency")}</span>
+          <span className="text-emerald-600 dark:text-emerald-400 font-bold">{t("dashboard.excellent")}</span>
         </div>
       </div>
     );
@@ -1083,7 +1085,7 @@ export default function Home() {
                     {statsData.streakCount > 0 ? Math.round(statsData.totalStudyTime / statsData.streakCount) : 0}m / day
                   </span>
                   <span className="text-[10px] app-theme-text-muted block mt-0.5">
-                    Konsistensi: 85%
+                    {t("dashboard.consistency")}: 85%
                   </span>
                 </div>
               </div>
@@ -1092,7 +1094,7 @@ export default function Home() {
             {/* Course Progress List */}
             <div className="flex flex-col gap-3.5 w-full">
               <h3 className="text-xs font-bold uppercase tracking-wider app-theme-text-muted">
-                Course Progress
+                {t("dashboard.courseProgress")}
               </h3>
 
               <div className="flex flex-col gap-3 w-full">
@@ -1264,18 +1266,18 @@ export default function Home() {
                   25+ Lectures • 45 Enrolled
                 </span>
                 <h3 className="text-xl font-extrabold text-white mt-1 leading-tight tracking-tight max-w-[200px] sm:max-w-xs">
-                  UI/UX Design Live Class
+                  {t("dashboard.featuredClass")}
                 </h3>
               </div>
               <div className="flex items-center justify-between mt-4 z-10">
                 <p className="text-[10px] text-white/70 font-medium">
-                  Mulai belajar kelas live hari ini
+                  {t("dashboard.startLearningLive")}
                 </p>
                 <ProtectedCourse subjectId="ui-ux" onClick={() => window.open(liveClassLink, "_blank")}>
                   <button
                     className="bg-white text-black hover:bg-white/90 rounded-full px-5 py-2 text-xs font-bold shadow-md transition-all active:scale-95 cursor-pointer"
                   >
-                    Lanjut Belajar
+                    {t("dashboard.continueLearning")}
                   </button>
                 </ProtectedCourse>
               </div>

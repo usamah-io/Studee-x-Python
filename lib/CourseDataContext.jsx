@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import i18n from "./i18n";
 
 const CourseDataContext = createContext(undefined);
 
@@ -51,6 +52,10 @@ export function CourseDataProvider({ children }) {
             localStorage.setItem("hasFaceId", "true");
           } else {
             localStorage.removeItem("hasFaceId");
+          }
+          if (data.language) {
+            i18n.changeLanguage(data.language);
+            localStorage.setItem("studee_language", data.language);
           }
         }
         setStatsData(data.stats || {

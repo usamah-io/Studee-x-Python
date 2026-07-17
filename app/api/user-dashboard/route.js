@@ -133,6 +133,7 @@ export async function GET(request) {
         lastStudyDate: lastStudyDate || "2026-07-01",
       },
       hasFaceId: dbUser ? dbUser.faceDescriptor.length > 0 : false,
+      language: dbUser ? dbUser.language : "id",
       courseList,
     };
 
@@ -198,5 +199,47 @@ export async function POST(request) {
   } catch (error) {
     console.error("POST API user-dashboard Error:", error);
     return NextResponse.json({ error: "Gagal menyimpan log belajar." }, { status: 500 });
+  }
+}
+
+export async function PUT(request) {
+  try {
+    const body = await request.json();
+    const { email, language } = body;
+
+    if (!email) {
+      return NextResponse.json({ error: "Email is required." }, { status: 400 });
+    }
+    if (!language) {
+      return NextResponse.json({ error: "Language is required." }, { status: 400 });
+    }
+
+    // Find or create user, then update language
+    let dbUser = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (!dbUser) {
+      dbUser = await prisma.user.create({
+        data: {
+          email,
+          name: email.split("@")[0],
+          streak: 0,
+          language: language
+        }
+      });
+    } else {
+      dbUser = await prisma.user.update({
+        where: { id: dbUser.id },
+        data: {
+          language: language
+        }
+      });
+    }
+
+    return NextResponse.json({ success: true, user: dbUser });
+  } catch (error) {
+    console.error("PUT API user-dashboard Error:", error);
+    return NextResponse.json({ error: "Gagal memperbarui bahasa." }, { status: 500 });
   }
 }
