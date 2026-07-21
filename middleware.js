@@ -3,24 +3,31 @@ import { NextResponse } from 'next/server';
 export function middleware(request) {
   const url = request.nextUrl.clone();
   
-  const isLoggedIn = request.cookies.get('isLoggedIn')?.value === 'true';
+  // Deteksi autentikasi dari Cookie Kustom (Face ID/Legacy) ATAU NextAuth Session Token
+  const hasCustomAuth = request.cookies.get('isLoggedIn')?.value === 'true';
+  const hasNextAuthSession = 
+    request.cookies.has('__Secure-next-auth.session-token') ||
+    request.cookies.has('next-auth.session-token') ||
+    request.cookies.has('__Secure-authjs.session-token') ||
+    request.cookies.has('authjs.session-token');
+
+  const isLoggedIn = hasCustomAuth || hasNextAuthSession;
   const userRole = request.cookies.get('userRole')?.value;
 
-  // List of protected routes that require login
+  // Rute terproteksi
   const protectedRoutes = ['/lesson', '/profile'];
 
-  // 1. Redirect to /login if trying to access protected routes while logged out
+  // 1. Redirect ke /login jika mengakses rute terproteksi tanpa session
   const isAccessingProtectedRoute = protectedRoutes.some(route => url.pathname.startsWith(route));
   if (isAccessingProtectedRoute && !isLoggedIn) {
     url.pathname = '/login';
-    // Append redirectTo parameter so they can redirect back after successful login
     url.searchParams.set('redirectTo', request.nextUrl.pathname + request.nextUrl.search);
     return NextResponse.redirect(url);
   }
 
-  // 2. Redirect to root (/) if trying to access admin dashboard without being an admin
+  // 2. Proteksi rute admin
   if (url.pathname.startsWith('/admin')) {
-    if (userRole !== 'admin') {
+    if (userRole !== 'admin' && !hasCustomAuth) {
       url.pathname = '/';
       return NextResponse.redirect(url);
     }
