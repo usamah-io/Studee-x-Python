@@ -24,8 +24,21 @@ export async function POST(request) {
     }
 
     // Ambil semua user dan filter yang memiliki data Face ID valid (128-dimensi) di memory
-    const allUsers = await prisma.user.findMany();
-    const users = allUsers.filter(user => user.faceDescriptor && user.faceDescriptor.length === 128);
+    let allUsers;
+    try {
+      allUsers = await prisma.user.findMany();
+    } catch (dbError) {
+      console.error("Gagal terhubung ke database MongoDB via Prisma:", dbError);
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: "Koneksi database gagal. Pastikan variabel DATABASE_URL atau MONGODB_URI telah diatur di Dashboard Vercel." 
+        },
+        { status: 500 }
+      );
+    }
+
+    const users = (allUsers || []).filter(user => user.faceDescriptor && user.faceDescriptor.length === 128);
 
     if (users.length === 0) {
       return NextResponse.json(
