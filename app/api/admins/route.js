@@ -3,10 +3,13 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { MongoClient } from "mongodb";
 
-const uri = process.env.DATABASE_URL;
+const uri = process.env.DATABASE_URL || process.env.MONGODB_URI;
 let mongoClient = null;
 
 async function getDb() {
+  if (!uri) {
+    throw new Error("DATABASE_URL atau MONGODB_URI tidak dikonfigurasi di environment variables.");
+  }
   if (!mongoClient) {
     mongoClient = new MongoClient(uri);
     await mongoClient.connect();
