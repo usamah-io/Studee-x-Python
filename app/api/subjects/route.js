@@ -74,8 +74,11 @@ export async function GET(request) {
     
     return NextResponse.json(subjects);
   } catch (error) {
-    console.error("GET API Error:", error);
-    return NextResponse.json({ error: "Gagal mengambil data materi dari database." }, { status: 500 });
+    console.error("GET API Error (Detailed Stack):", error);
+    return NextResponse.json({ 
+      error: "Gagal mengambil data materi dari database.",
+      details: error.message || String(error)
+    }, { status: 500 });
   }
 }
 
@@ -85,6 +88,13 @@ export async function POST(request) {
     const body = await request.json();
     const { id, title, description, category, driveLink, videoUrl, quizStatus, questions, syllabus } = body;
 
+    // Validasi field yang wajib diisi
+    if (!title || title.trim() === "" || !description || description.trim() === "" || !category || category.trim() === "" || !driveLink || driveLink.trim() === "") {
+      return NextResponse.json({ 
+        error: "Validasi Gagal: Judul (title), Deskripsi (description), Kategori (category), dan Link Drive (driveLink) wajib diisi." 
+      }, { status: 400 });
+    }
+
     let result;
 
     if (id && id.length === 24) {
@@ -92,25 +102,25 @@ export async function POST(request) {
       result = await prisma.subject.update({
         where: { id },
         data: {
-          title,
-          description,
-          category,
-          driveLink,
-          videoUrl,
-          quizStatus,
-          questions,
-          syllabus
+          title: title.trim(),
+          description: description.trim(),
+          category: category.trim(),
+          driveLink: driveLink.trim(),
+          videoUrl: videoUrl ? videoUrl.trim() : null,
+          quizStatus: quizStatus || "Belum Ada",
+          questions: questions || [],
+          syllabus: syllabus || []
         }
       });
     } else {
       // Create Mode
       result = await prisma.subject.create({
         data: {
-          title,
-          description,
-          category,
-          driveLink,
-          videoUrl,
+          title: title.trim(),
+          description: description.trim(),
+          category: category.trim(),
+          driveLink: driveLink.trim(),
+          videoUrl: videoUrl ? videoUrl.trim() : null,
           quizStatus: quizStatus || "Belum Ada",
           questions: questions || [],
           syllabus: syllabus || []
@@ -120,8 +130,11 @@ export async function POST(request) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("POST API Error:", error);
-    return NextResponse.json({ error: "Gagal memproses data materi di database." }, { status: 500 });
+    console.error("POST API Error (Detailed Stack):", error);
+    return NextResponse.json({ 
+      error: "Gagal memproses data materi di database.",
+      details: error.message || String(error)
+    }, { status: 500 });
   }
 }
 
@@ -140,7 +153,10 @@ export async function DELETE(request) {
 
     return NextResponse.json({ success: true, deleted: result });
   } catch (error) {
-    console.error("DELETE API Error:", error);
-    return NextResponse.json({ error: "Gagal menghapus data materi dari database." }, { status: 500 });
+    console.error("DELETE API Error (Detailed Stack):", error);
+    return NextResponse.json({ 
+      error: "Gagal menghapus data materi dari database.",
+      details: error.message || String(error)
+    }, { status: 500 });
   }
 }
