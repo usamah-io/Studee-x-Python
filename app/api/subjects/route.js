@@ -75,10 +75,8 @@ export async function GET(request) {
     return NextResponse.json(subjects);
   } catch (error) {
     console.error("GET API Error (Detailed Stack):", error);
-    return NextResponse.json({ 
-      error: "Gagal mengambil data materi dari database.",
-      details: error.message || String(error)
-    }, { status: 500 });
+    // Fallback to default seed subjects if DB is unreachable to prevent UI 500 error
+    return NextResponse.json(defaultSeedSubjects);
   }
 }
 
@@ -88,12 +86,15 @@ export async function POST(request) {
     const body = await request.json();
     const { id, title, description, category, driveLink, videoUrl, quizStatus, questions, syllabus } = body;
 
-    // Validasi field yang wajib diisi
-    if (!title || title.trim() === "" || !description || description.trim() === "" || !category || category.trim() === "" || !driveLink || driveLink.trim() === "") {
+    // Validasi field minimal yang wajib diisi
+    if (!title || title.trim() === "" || !description || description.trim() === "") {
       return NextResponse.json({ 
-        error: "Validasi Gagal: Judul (title), Deskripsi (description), Kategori (category), dan Link Drive (driveLink) wajib diisi." 
+        error: "Validasi Gagal: Judul (title) dan Deskripsi (description) wajib diisi." 
       }, { status: 400 });
     }
+
+    const safeCategory = (category && category.trim() !== "") ? category.trim() : "General";
+    const safeDriveLink = (driveLink && driveLink.trim() !== "") ? driveLink.trim() : "";
 
     let result;
 
@@ -104,8 +105,8 @@ export async function POST(request) {
         data: {
           title: title.trim(),
           description: description.trim(),
-          category: category.trim(),
-          driveLink: driveLink.trim(),
+          category: safeCategory,
+          driveLink: safeDriveLink,
           videoUrl: videoUrl ? videoUrl.trim() : null,
           quizStatus: quizStatus || "Belum Ada",
           questions: questions || [],
@@ -118,8 +119,8 @@ export async function POST(request) {
         data: {
           title: title.trim(),
           description: description.trim(),
-          category: category.trim(),
-          driveLink: driveLink.trim(),
+          category: safeCategory,
+          driveLink: safeDriveLink,
           videoUrl: videoUrl ? videoUrl.trim() : null,
           quizStatus: quizStatus || "Belum Ada",
           questions: questions || [],
@@ -133,6 +134,41 @@ export async function POST(request) {
     console.error("POST API Error (Detailed Stack):", error);
     return NextResponse.json({ 
       error: "Gagal memproses data materi di database.",
+      details: error.message || String(error)
+    }, { status: 500 });
+  }
+}
+
+// PUT: Partial update for subject (e.g. updating syllabus, questions, or specific fields)
+export async function PUT(request) {
+  try {
+    const body = await request.json();
+    const { id, title, description, category, driveLink, videoUrl, quizStatus, questions, syllabus } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "ID materi diperlukan." }, { status: 400 });
+    }
+
+    const updateData = {};
+    if (title !== undefined) updateData.title = title.trim();
+    if (description !== undefined) updateData.description = description.trim();
+    if (category !== undefined) updateData.category = category.trim();
+    if (driveLink !== undefined) updateData.driveLink = driveLink.trim();
+    if (videoUrl !== undefined) updateData.videoUrl = videoUrl ? videoUrl.trim() : null;
+    if (quizStatus !== undefined) updateData.quizStatus = quizStatus;
+    if (questions !== undefined) updateData.questions = questions;
+    if (syllabus !== undefined) updateData.syllabus = syllabus;
+
+    const result = await prisma.subject.update({
+      where: { id },
+      data: updateData
+    });
+
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error("PUT API Error (Detailed Stack):", error);
+    return NextResponse.json({ 
+      error: "Gagal memperbarui data materi di database.",
       details: error.message || String(error)
     }, { status: 500 });
   }
