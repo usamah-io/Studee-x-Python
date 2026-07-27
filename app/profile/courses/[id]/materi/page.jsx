@@ -16,6 +16,8 @@ export default function ManageSyllabusPage({ params }) {
   // Form states
   const [newMateriTitle, setNewMateriTitle] = useState("");
   const [newMateriDuration, setNewMateriDuration] = useState("15 Menit");
+  const [newMateriVideoUrl, setNewMateriVideoUrl] = useState("");
+  const [newMateriDriveLink, setNewMateriDriveLink] = useState("");
   const [isSavingSyllabus, setIsSavingSyllabus] = useState(false);
 
   useEffect(() => {
@@ -49,7 +51,12 @@ export default function ManageSyllabusPage({ params }) {
 
     const updatedSyllabus = [
       ...(subject.syllabus || []),
-      { title: newMateriTitle.trim(), duration: newMateriDuration }
+      { 
+        title: newMateriTitle.trim(), 
+        duration: newMateriDuration,
+        videoUrl: newMateriVideoUrl.trim() || "",
+        driveLink: newMateriDriveLink.trim() || ""
+      }
     ];
 
     fetch("/api/subjects", {
@@ -67,6 +74,8 @@ export default function ManageSyllabusPage({ params }) {
           alert("Materi baru berhasil ditambahkan!");
           setSubject(data);
           setNewMateriTitle("");
+          setNewMateriVideoUrl("");
+          setNewMateriDriveLink("");
         } else {
           alert("Gagal menambahkan materi.");
         }
@@ -173,7 +182,31 @@ export default function ManageSyllabusPage({ params }) {
                   <option value="15 Menit">15 Menit</option>
                   <option value="20 Menit">20 Menit</option>
                   <option value="30 Menit">30 Menit</option>
+                  <option value="45 Menit">45 Menit</option>
+                  <option value="60 Menit">60 Menit</option>
                 </select>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[8px] font-bold uppercase tracking-widest opacity-60 pl-1">Link Video Pembelajaran (Opsional)</label>
+                <input
+                  type="url"
+                  value={newMateriVideoUrl}
+                  onChange={(e) => setNewMateriVideoUrl(e.target.value)}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-3 px-4 text-xs focus:outline-none text-[var(--text-color)] placeholder:text-slate-400 dark:placeholder:text-white/30"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[8px] font-bold uppercase tracking-widest opacity-60 pl-1">Link PDF / Drive Dokumen (Opsional)</label>
+                <input
+                  type="url"
+                  value={newMateriDriveLink}
+                  onChange={(e) => setNewMateriDriveLink(e.target.value)}
+                  placeholder="https://drive.google.com/file/d/..."
+                  className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-3 px-4 text-xs focus:outline-none text-[var(--text-color)] placeholder:text-slate-400 dark:placeholder:text-white/30"
+                />
               </div>
 
               <button
@@ -196,12 +229,24 @@ export default function ManageSyllabusPage({ params }) {
                       key={idx}
                       className="w-full flex items-center justify-between p-4.5 rounded-2xl app-theme-card border border-white/5 bg-white/[0.01]"
                     >
-                      <div className="flex flex-col text-left max-w-[240px]">
+                      <div className="flex flex-col text-left max-w-[240px] gap-1">
                         <span className="text-xs font-bold app-theme-text truncate">
                           <span className="opacity-50 mr-1.5 font-extrabold">{idx + 1}.</span>
                           {item.title}
                         </span>
-                        <span className="text-[9px] app-theme-text-muted mt-1 font-semibold">{item.duration}</span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-[9px] app-theme-text-muted font-semibold">{item.duration}</span>
+                          {item.videoUrl && (
+                            <span className="text-[8px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 font-bold border border-purple-500/20">
+                              🎥 Video
+                            </span>
+                          )}
+                          {item.driveLink && (
+                            <span className="text-[8px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">
+                              📄 PDF/Drive
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <button
                         onClick={() => handleDeleteSyllabusMateri(idx)}
