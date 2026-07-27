@@ -86,35 +86,45 @@ export async function POST(request) {
     const body = await request.json();
     const { id, title, description, category, driveLink, videoUrl, quizStatus, questions, syllabus } = body;
 
-    // Validasi field minimal yang wajib diisi
-    if (!title || title.trim() === "" || !description || description.trim() === "") {
-      return NextResponse.json({ 
-        error: "Validasi Gagal: Judul (title) dan Deskripsi (description) wajib diisi." 
-      }, { status: 400 });
-    }
-
-    const safeCategory = (category && category.trim() !== "") ? category.trim() : "General";
-    const safeDriveLink = (driveLink && driveLink.trim() !== "") ? driveLink.trim() : "";
-
     let result;
 
     if (id && id.length === 24) {
-      // Update Mode
+      // Update Mode: Preserve existing values if field is empty or missing
+      const existing = await prisma.subject.findUnique({ where: { id } });
+      if (!existing) {
+        return NextResponse.json({ error: "Mata pelajaran tidak ditemukan." }, { status: 404 });
+      }
+
+      const updatedTitle = (title && title.trim() !== "") ? title.trim() : existing.title;
+      const updatedDesc = (description && description.trim() !== "") ? description.trim() : existing.description;
+      const updatedCategory = (category && category.trim() !== "") ? category.trim() : existing.category;
+      const updatedDriveLink = (driveLink !== undefined && driveLink !== null) ? driveLink.trim() : existing.driveLink;
+      const updatedVideoUrl = (videoUrl !== undefined && videoUrl !== null) ? (videoUrl ? videoUrl.trim() : null) : existing.videoUrl;
+
       result = await prisma.subject.update({
         where: { id },
         data: {
-          title: title.trim(),
-          description: description.trim(),
-          category: safeCategory,
-          driveLink: safeDriveLink,
-          videoUrl: videoUrl ? videoUrl.trim() : null,
-          quizStatus: quizStatus || "Belum Ada",
-          questions: questions || [],
-          syllabus: syllabus || []
+          title: updatedTitle,
+          description: updatedDesc,
+          category: updatedCategory,
+          driveLink: updatedDriveLink,
+          videoUrl: updatedVideoUrl,
+          quizStatus: quizStatus !== undefined ? quizStatus : existing.quizStatus,
+          questions: questions !== undefined ? questions : existing.questions,
+          syllabus: syllabus !== undefined ? syllabus : existing.syllabus
         }
       });
     } else {
-      // Create Mode
+      // Create Mode: Validasi field minimal
+      if (!title || title.trim() === "" || !description || description.trim() === "") {
+        return NextResponse.json({ 
+          error: "Validasi Gagal: Judul (title) dan Deskripsi (description) wajib diisi." 
+        }, { status: 400 });
+      }
+
+      const safeCategory = (category && category.trim() !== "") ? category.trim() : "General";
+      const safeDriveLink = (driveLink && driveLink.trim() !== "") ? driveLink.trim() : "";
+
       result = await prisma.subject.create({
         data: {
           title: title.trim(),

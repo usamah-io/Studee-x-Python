@@ -37,8 +37,8 @@ export default function EditCoursePage({ params }) {
           const found = data.find(s => String(s.id) === String(id));
           if (found) {
             setSubject(found);
-            setEditTitle(found.title || "");
-            setEditDesc(found.description || "");
+            setEditTitle(found.title || found.name || "");
+            setEditDesc(found.description || found.desc || "");
             const rawCat = found.category || "Science";
             const presets = ["Science", "Math", "Coding", "Science (IPA)", "Math (Matematika)", "Coding (Komputer)"];
             if (presets.includes(rawCat)) {
@@ -65,8 +65,12 @@ export default function EditCoursePage({ params }) {
 
   const handleUpdateSubject = (e) => {
     e.preventDefault();
-    if (!editTitle || !editDesc) {
-      alert("Judul dan Deskripsi kelas wajib diisi.");
+    if (!editTitle || !editTitle.trim()) {
+      alert("Judul kelas wajib diisi. Silakan masukkan nama judul kelas.");
+      return;
+    }
+    if (!editDesc || !editDesc.trim()) {
+      alert("Deskripsi ringkas kelas wajib diisi.");
       return;
     }
 
@@ -145,9 +149,10 @@ export default function EditCoursePage({ params }) {
               <label className="text-[8px] font-bold uppercase tracking-widest opacity-60 pl-1">Judul Kelas</label>
               <input
                 type="text"
+                placeholder="Masukkan Judul Kelas (cth: Pengenalan Flutter UI...)"
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
-                className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-3 px-4 text-xs focus:outline-none focus:ring-1 text-[var(--text-color)]"
+                className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-3 px-4 text-xs focus:outline-none focus:ring-1 text-[var(--text-color)] placeholder:text-slate-400 dark:placeholder:text-white/30 font-semibold"
               />
             </div>
 
