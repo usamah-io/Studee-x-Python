@@ -1088,12 +1088,30 @@ export default function AdminDashboard() {
                           <label className="text-[10px] text-white/50 font-bold uppercase tracking-wider pl-1">
                             Kategori Mapel
                           </label>
-                          <input
-                            type="text"
-                            value={editCategory}
-                            onChange={(e) => setEditCategory(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-xs text-white placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-purple-400 focus:bg-white/10 transition-all shadow-inner"
-                          />
+                          <div className="flex flex-col gap-2">
+                            <select
+                              value={["Science", "Math", "Coding", "Science (IPA)", "Math (Matematika)", "Coding (Komputer)"].includes(editCategory) ? editCategory : "CUSTOM"}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (val !== "CUSTOM") {
+                                  setEditCategory(val);
+                                }
+                              }}
+                              className="w-full bg-slate-900 border border-white/10 rounded-xl py-3 px-4 text-xs text-white focus:outline-none focus:ring-1 focus:ring-purple-400"
+                            >
+                              <option value="Science">Science (IPA)</option>
+                              <option value="Math">Math (Matematika)</option>
+                              <option value="Coding">Coding (Komputer)</option>
+                              <option value="CUSTOM">✏️ + Ketik Manual (Kategori Baru)...</option>
+                            </select>
+                            <input
+                              type="text"
+                              placeholder="Ketik judul kategori manual..."
+                              value={editCategory}
+                              onChange={(e) => setEditCategory(e.target.value)}
+                              className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-xs text-white placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-purple-400 focus:bg-white/10 transition-all shadow-inner"
+                            />
+                          </div>
                         </div>
                       </div>
 
@@ -1357,19 +1375,40 @@ export default function AdminDashboard() {
                     <label className={`text-[10px] font-bold uppercase tracking-wider pl-1 ${
                       isDarkMode ? 'text-white/50' : 'text-slate-500'
                     }`}>
-                      Kategori
+                      Kategori (Mapel)
                     </label>
-                    <input
-                      type="text"
-                      placeholder="Contoh: IPS, Science, Coding..."
-                      value={newMapelCategory}
-                      onChange={(e) => setNewMapelCategory(e.target.value)}
-                      className={`w-full border rounded-xl py-3 px-4 text-xs placeholder-opacity-40 transition-all shadow-inner focus:outline-none focus:ring-1 ${
-                        isDarkMode
-                          ? 'bg-white/5 border-white/10 text-white placeholder-white/20 focus:ring-white/20 focus:bg-white/10'
-                          : 'bg-black/5 border-black/10 text-slate-900 placeholder-slate-400 focus:ring-slate-950/20 focus:bg-black/10'
-                      }`}
-                    />
+                    <div className="flex flex-col gap-2">
+                      <select
+                        value={["Science", "Math", "Coding", "Science (IPA)", "Math (Matematika)", "Coding (Komputer)"].includes(newMapelCategory) ? newMapelCategory : "CUSTOM"}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val !== "CUSTOM") {
+                            setNewMapelCategory(val);
+                          }
+                        }}
+                        className={`w-full border rounded-xl py-3 px-4 text-xs transition-all shadow-inner focus:outline-none focus:ring-1 ${
+                          isDarkMode
+                            ? 'bg-slate-900 border-white/10 text-white focus:ring-white/20'
+                            : 'bg-white border-black/10 text-slate-900 focus:ring-slate-950/20'
+                        }`}
+                      >
+                        <option value="Science">Science (IPA)</option>
+                        <option value="Math">Math (Matematika)</option>
+                        <option value="Coding">Coding (Komputer)</option>
+                        <option value="CUSTOM">✏️ + Ketik Manual (Kategori Baru)...</option>
+                      </select>
+                      <input
+                        type="text"
+                        placeholder="Ketik nama/judul kategori secara manual..."
+                        value={newMapelCategory}
+                        onChange={(e) => setNewMapelCategory(e.target.value)}
+                        className={`w-full border rounded-xl py-2.5 px-4 text-xs placeholder-opacity-40 transition-all shadow-inner focus:outline-none focus:ring-1 ${
+                          isDarkMode
+                            ? 'bg-white/5 border-white/10 text-white placeholder-white/20 focus:ring-white/20 focus:bg-white/10'
+                            : 'bg-black/5 border-black/10 text-slate-900 placeholder-slate-400 focus:ring-slate-950/20 focus:bg-black/10'
+                        }`}
+                      />
+                    </div>
                   </div>
                 </div>
 

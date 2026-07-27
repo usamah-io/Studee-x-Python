@@ -17,6 +17,8 @@ export default function EditCoursePage({ params }) {
   const [editTitle, setEditTitle] = useState("");
   const [editDesc, setEditDesc] = useState("");
   const [editCat, setEditCat] = useState("Science");
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
+  const [customCatInput, setCustomCatInput] = useState("");
   const [editLevel, setEditLevel] = useState("Beginner");
   const [editVideoUrl, setEditVideoUrl] = useState("");
   const [editPdfUrl, setEditPdfUrl] = useState("");
@@ -37,7 +39,17 @@ export default function EditCoursePage({ params }) {
             setSubject(found);
             setEditTitle(found.title || "");
             setEditDesc(found.description || "");
-            setEditCat(found.category || "Science");
+            const rawCat = found.category || "Science";
+            const presets = ["Science", "Math", "Coding", "Science (IPA)", "Math (Matematika)", "Coding (Komputer)"];
+            if (presets.includes(rawCat)) {
+              setEditCat(rawCat);
+              setIsCustomCategory(false);
+              setCustomCatInput("");
+            } else {
+              setEditCat("CUSTOM");
+              setIsCustomCategory(true);
+              setCustomCatInput(rawCat);
+            }
             setEditLevel(found.level || "Beginner");
             setEditVideoUrl(found.videoUrl || "");
             setEditPdfUrl(found.driveLink || "");
@@ -58,12 +70,14 @@ export default function EditCoursePage({ params }) {
       return;
     }
 
+    const finalCategory = isCustomCategory ? (customCatInput.trim() || "General") : editCat;
+
     setIsSaving(true);
     const payload = {
       id: subject.id,
       title: editTitle,
       description: editDesc,
-      category: editCat,
+      category: finalCategory,
       level: editLevel,
       videoUrl: editVideoUrl,
       driveLink: editPdfUrl,
@@ -147,18 +161,37 @@ export default function EditCoursePage({ params }) {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div className="flex flex-col gap-1">
                 <label className="text-[8px] font-bold uppercase tracking-widest opacity-60 pl-1">Kategori (Mapel)</label>
                 <select
-                  value={editCat}
-                  onChange={(e) => setEditCat(e.target.value)}
+                  value={isCustomCategory ? "CUSTOM" : editCat}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === "CUSTOM") {
+                      setIsCustomCategory(true);
+                    } else {
+                      setIsCustomCategory(false);
+                      setEditCat(val);
+                    }
+                  }}
                   className="bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-white/10 rounded-2xl py-3 px-4 text-xs focus:outline-none text-[var(--text-color)]"
                 >
                   <option value="Science">Science (IPA)</option>
                   <option value="Math">Math (Matematika)</option>
                   <option value="Coding">Coding (Komputer)</option>
+                  <option value="CUSTOM">✏️ + Ketik Manual (Kategori Baru)...</option>
                 </select>
+
+                {isCustomCategory && (
+                  <input
+                    type="text"
+                    placeholder="Ketik judul kategori manual..."
+                    value={customCatInput}
+                    onChange={(e) => setCustomCatInput(e.target.value)}
+                    className="mt-1 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-2.5 px-4 text-xs focus:outline-none text-[var(--text-color)] placeholder:text-slate-400 dark:placeholder:text-white/30"
+                  />
+                )}
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[8px] font-bold uppercase tracking-widest opacity-60 pl-1">Level Kesulitan</label>
